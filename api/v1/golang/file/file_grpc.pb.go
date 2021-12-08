@@ -4,6 +4,7 @@ package file
 
 import (
 	context "context"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -46,7 +47,7 @@ func (c *fileClient) File(ctx context.Context, in *FileModel, opts ...grpc.CallO
 }
 
 type File_FileClient interface {
-	Recv() (*FileChunk, error)
+	Recv() (*httpbody.HttpBody, error)
 	grpc.ClientStream
 }
 
@@ -54,8 +55,8 @@ type fileFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *fileFileClient) Recv() (*FileChunk, error) {
-	m := new(FileChunk)
+func (x *fileFileClient) Recv() (*httpbody.HttpBody, error) {
+	m := new(httpbody.HttpBody)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -100,7 +101,7 @@ func _File_File_Handler(srv interface{}, stream grpc.ServerStream) error {
 }
 
 type File_FileServer interface {
-	Send(*FileChunk) error
+	Send(*httpbody.HttpBody) error
 	grpc.ServerStream
 }
 
@@ -108,7 +109,7 @@ type fileFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *fileFileServer) Send(m *FileChunk) error {
+func (x *fileFileServer) Send(m *httpbody.HttpBody) error {
 	return x.ServerStream.SendMsg(m)
 }
 

@@ -4,11 +4,17 @@ package core.backend.integration.api.v1.file;
 
 option go_package="github.com/goldexrobot/core.backend.integration/api/v1/golang/file/file;file";
 
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
 import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
 
 service File {
 	// Get a file by ID
-	rpc File(FileModel) returns (stream FileChunk) {}
+	rpc File(FileModel) returns (stream google.api.HttpBody) {
+		option (google.api.http) = {
+			get: "/v1/file/{id}"
+		};
+	}
 }
 
 message FileModel {
