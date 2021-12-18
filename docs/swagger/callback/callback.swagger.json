@@ -115,7 +115,7 @@
           "example": 3.141
         }
       },
-      "x-go-package": "github.com/goldexrobot/core.backend.integration/callback"
+      "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     },
     "EvalFinishedPhoto": {
       "description": "EvalFinishedPhoto contains evaluation photo details",
@@ -140,7 +140,7 @@
           "example": "eef30f5dc98e4c7d8d2f8df9df56c0d0"
         }
       },
-      "x-go-package": "github.com/goldexrobot/core.backend.integration/callback"
+      "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     },
     "EvalStarted": {
       "description": "EvalStarted describes new evaluation that is being just started",
@@ -168,7 +168,7 @@
           "example": 1
         }
       },
-      "x-go-package": "github.com/goldexrobot/core.backend.integration/callback"
+      "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     },
     "StorageCellEvent": {
       "description": "StorageCellEvent is common data sent in storage related callbacks",
@@ -201,7 +201,7 @@
           "example": 1
         }
       },
-      "x-go-package": "github.com/goldexrobot/core.backend.integration/callback"
+      "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     }
   }
 }

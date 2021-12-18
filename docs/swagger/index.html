@@ -3,60 +3,71 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Swagger UI</title>
-  <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
-  <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
-  <style>
-    html {
-      box-sizing: border-box;
-      overflow: -moz-scrollbars-vertical;
-      overflow-y: scroll;
-    }
+	<meta charset="UTF-8">
+	<title>Swagger UI</title>
+	<link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
+	<link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+	<style>
+		html {
+			box-sizing: border-box;
+			overflow: -moz-scrollbars-vertical;
+			overflow-y: scroll;
+		}
 
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit;
-    }
+		*,
+		*:before,
+		*:after {
+			box-sizing: inherit;
+		}
 
-    body {
-      margin: 0;
-      background: #fafafa;
-    }
-  </style>
+		body {
+			margin: 0;
+			background: #fafafa;
+		}
+	</style>
 </head>
 
 <body>
-  <div id="swagger-ui"></div>
+	<div id="swagger-ui"></div>
 
-  <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
-  <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-  <script>
-    window.onload = function () {
-      // Begin Swagger UI call region
-      const ui = SwaggerUIBundle({
-        urls: [
-          { url: "/callback/callback.swagger.json", name: "Callback models" },
-          { url: "/api/v1/file.swagger.json", name: "API: File" },
-        ],
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
-      });
-      // End Swagger UI call region
+	<script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
+	<script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+	<script>
+		let urls = [
+			{ url: "./callback/callback.swagger.json", name: "Backend / Callbacks", htag: 'backend-callbacks' },
+			{ url: "./api/v1/file.swagger.json", name: "Backend / API File", htag: 'backend-api-file' },
+		];
+		let primaryUrl = '';
+		if (window.location.hash !== '') {
+			urls.forEach(v => {
+				if (window.location.hash === '#' + v.htag) {
+					primaryUrl = v.name;
+				}
+			});
+		}
 
-      window.ui = ui;
-    };
-  </script>
+		window.onload = function () {
+			// Begin Swagger UI call region
+			const ui = SwaggerUIBundle({
+				urls: urls,
+				'urls.primaryName': primaryUrl,
+				dom_id: '#swagger-ui',
+				deepLinking: true,
+				presets: [
+					SwaggerUIBundle.presets.apis,
+					SwaggerUIStandalonePreset
+				],
+				plugins: [
+					SwaggerUIBundle.plugins.DownloadUrl
+				],
+				layout: "StandaloneLayout"
+			});
+			// End Swagger UI call region
+
+			window.ui = ui;
+		};
+	</script>
 </body>
 
 </html>

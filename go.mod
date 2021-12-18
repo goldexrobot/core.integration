@@ -1,4 +1,4 @@
-module github.com/goldexrobot/core.backend.integration
+module github.com/goldexrobot/core.integration
 
 go 1.17
 
