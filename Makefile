@@ -1,4 +1,4 @@
-all: backend
+all: backend terminal
 	@:
 
 tools:
@@ -8,3 +8,6 @@ tools:
 
 backend:
 	@$(MAKE) --no-print-directory -C backend
+
+terminal:
+	@$(MAKE) --no-print-directory -C terminal

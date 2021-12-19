@@ -1,0 +1,353 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "ws"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Goldex Robot terminal serves JSONRPC 2 API and accepts Websocket connections on localhost\\:80\\/ws. Websocket messages are textual, not binary.\n\nHow to read the document.\nThis doc is generated according to OpenAPI 2, so JSONRPC methods are defined as POST methods. Actual method name is defined after slash symbol.\nFor example\\:\n\n`\"POST /inlet.open\"`\n\nmeans JSONRPC request\n\n`{\"version\":\"2.0\",\"id\":1,\"method\":\"inlet.open\",\"params\":{...}}`",
+    "title": "Terminal JSONRPC API.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:80",
+  "basePath": "/ws",
+  "paths": {
+    "/eval.hydro": {
+      "post": {
+        "description": "Starts a hydrostatic evaluation of the item. Should be called right after `eval.spectrum`.\nOn successful hydrostatic evaluation the item might be returned back to customer with `eval.return`.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Hydrostatic evaluation [III].",
+        "operationId": "EvalHydro",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Hydrostatic evaluation result",
+            "scheme": {
+              "$ref": "#/definitions/EvalHydroResult"
+            }
+          }
+        }
+      }
+    },
+    "/eval.new": {
+      "post": {
+        "description": "Prepares a new evaluation operation: check hardware, notify backend server, etc.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "New evaluation [I].",
+        "operationId": "EvalNew",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "New evaluation ID or a failure",
+            "scheme": {
+              "$ref": "#/definitions/EvalNewResult"
+            }
+          }
+        }
+      }
+    },
+    "/eval.return": {
+      "post": {
+        "description": "Starts a returning process of the item. Should be called only on successful spectral/hydrostatic evaluation.\nOn successful returning outlet window should be closed manually: customer choice (preferred) or a timeout.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Return item [IV].",
+        "operationId": "EvalReturn",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "No payload"
+          }
+        }
+      }
+    },
+    "/eval.spectrum": {
+      "post": {
+        "description": "Starts a spectral evaluation of the item. Should be called right after `eval.new`.\nOn successful spectral evaluation the item might be returned back to customer with `eval.return`, otherwise the evaluation should be continued with `eval.hydro`.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Spectral evaluation [II].",
+        "operationId": "EvalSpectrum",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Spectral evaluation result",
+            "scheme": {
+              "$ref": "#/definitions/EvalSpectrumResult"
+            }
+          }
+        }
+      }
+    },
+    "/eval.store": {
+      "post": {
+        "description": "Requires hardware to transfer successfully evaluated item into the internal storage.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Evaluation"
+        ],
+        "summary": "Store item [IV].",
+        "operationId": "EvalStore",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Success",
+            "scheme": {
+              "$ref": "#/definitions/EvalStoreResult"
+            }
+          }
+        }
+      }
+    },
+    "/inlet.close": {
+      "post": {
+        "description": "Requires hardware to close inlet window. Should be called right before evaluation launch.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Inlet/outlet window"
+        ],
+        "summary": "Close inlet window.",
+        "operationId": "InletClose",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "No payload"
+          }
+        }
+      }
+    },
+    "/inlet.open": {
+      "post": {
+        "description": "Requires hardware to open inlet window. Should be called to receive a customer item before evaluation.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Inlet/outlet window"
+        ],
+        "summary": "Open inlet window.",
+        "operationId": "InletOpen",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "No payload"
+          }
+        }
+      }
+    },
+    "/outlet.close": {
+      "post": {
+        "description": "Requires hardware to close outlet window. Should be called manually after customer item return or storage item extraction.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Inlet/outlet window"
+        ],
+        "summary": "Close outlet window.",
+        "operationId": "OutletClose",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "No payload"
+          }
+        }
+      }
+    },
+    "/storage.extract": {
+      "post": {
+        "description": "Requires hardware to extract an item from the specified storage cell and bring it to the outlet window.\nOn successful extraction the outlet window should be closed manually: customer choice (preferred) or a timeout.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Storage"
+        ],
+        "summary": "Extract item.",
+        "operationId": "StorageExtract",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "No payload"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "EvalHydroResult": {
+      "type": "object",
+      "title": "Hydrostatic evaluation result.",
+      "properties": {
+        "Success": {
+          "$ref": "#/definitions/EvalHydroResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalHydroResultSuccess": {
+      "type": "object",
+      "properties": {
+        "alloy": {
+          "type": "string",
+          "x-go-name": "Alloy"
+        },
+        "carat": {
+          "type": "string",
+          "x-go-name": "Carat"
+        },
+        "confidence": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Confidence"
+        },
+        "millesimal": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Millesimal"
+        },
+        "purity": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Purity"
+        },
+        "risky": {
+          "type": "boolean",
+          "x-go-name": "Risky"
+        },
+        "weight": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Weight"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalNewResult": {
+      "type": "object",
+      "title": "New evaluation result.",
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalSpectrumResult": {
+      "type": "object",
+      "title": "Spectral evaluation result.",
+      "properties": {
+        "Success": {
+          "$ref": "#/definitions/EvalSpectrumResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalSpectrumResultSuccess": {
+      "type": "object",
+      "properties": {
+        "alloy": {
+          "type": "string",
+          "x-go-name": "Alloy"
+        },
+        "carat": {
+          "type": "string",
+          "x-go-name": "Carat"
+        },
+        "millesimal": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Millesimal"
+        },
+        "purity": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Purity"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalStoreRequest": {
+      "type": "object",
+      "title": "Item storing request.",
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalStoreResult": {
+      "type": "object",
+      "title": "Item storing result.",
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "StorageExtractRequest": {
+      "type": "object",
+      "title": "Item extraction request.",
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    }
+  }
+}

@@ -10,5 +10,5 @@ all: file.proto
 		--go-grpc_out=paths=source_relative:./$*/ \
 		--validate_out=lang=go,paths=source_relative:./$*/ \
 		--grpc-gateway_out=logtostderr=true,paths=source_relative:./$*/ \
-		--openapiv2_out=logtostderr=true:./../../../../docs/swagger/api/v1/ \
+		--openapiv2_out=logtostderr=true:./../../../../docs/swagger/backend/api/v1/ \
 		$*.proto
