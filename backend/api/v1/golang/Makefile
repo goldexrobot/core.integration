@@ -5,7 +5,7 @@ all: file.proto
 
 %.proto:
 	@mkdir -p $*
-	protoc $(PROTOC_INC) \
+	@protoc $(PROTOC_INC) \
 		--go_out=./$*/ --go_opt=paths=source_relative \
 		--go-grpc_out=paths=source_relative:./$*/ \
 		--validate_out=lang=go,paths=source_relative:./$*/ \
