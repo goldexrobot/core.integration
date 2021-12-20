@@ -47,4 +47,4 @@ Allowed JWT signing algorithms: `HS256` (HMAC SHA-256), `HS384` (HMAC SHA-384), 
 
 ## Testing
 
-Try out signature [here](/TODO).
+Try out signature [here](https://goldexrobot.github.io/core.integration/signature/).

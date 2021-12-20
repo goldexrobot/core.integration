@@ -16,7 +16,7 @@ For instance: items evaluation, storage interaction, etc.
 
 Partner backend have to respond with successful HTTP status (200, 201, or 202) to signalize about callback consumption. Until then Goldex will continue to send callback requests.
 
-Callback models are described in [swagger](/TODO)
+Callback models are described in [swagger](https://goldexrobot.github.io/core.integration/swagger/#/backend-callbacks)
 
 ## UI methods
 

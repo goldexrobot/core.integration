@@ -1,19 +1,32 @@
 # Goldex Robot: Integration
 
-Goldex performs [callbacks](/CALLBACK.md) to notify about events or to request some realtime information.
+Integration with Goldex consists of two major parts: backend integration and terminal integration.
 
-Goldex [API](/API.md) exposes methods to get information on demand.
+Documentation is [here](https://goldexrobot.github.io/core.integration/).
 
-HTTP statuses threated as successful are: 200, 201, 202
+---
 
-We are using JWT to [sign](/SIGNATURE.md) requests to/from Goldex.
+## Backend
 
-Some terms:
-| Term | Description |
-| --- | --- |
-| API | Goldex API provides details on bots |
-| Bot | Goldex Robot vending terminal |
-| Callback | Event from Goldex side |
-| UI methods | Custom methods for UI flow like customer identification, payments processing, etc. |
-| Project | Particular integration with Goldex |
+### Callbacks
 
+Goldex sends [callbacks](/CALLBACK.md) to notify your backend about a new events or to request some information for the vending terminal in real time.
+
+Navigate to Goldex dashbaord to setup callbacks, keys etc.
+
+[Documentation](https://goldexrobot.github.io/core.integration/swagger/#/backend-callbacks)
+
+### API
+
+Goldex exposes an API to provide some extended information like photos, storage access history etc.
+Moreover the API allows you to control a vending terminal.
+
+Calls to HTTP API must be properly [signed](/SIGNATURE.md) with per-project private key. You can get the key in Goldex dashboard.
+
+GRPC API is also available.
+
+---
+
+## Terminal
+
+TODO

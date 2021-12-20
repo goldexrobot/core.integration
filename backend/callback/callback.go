@@ -1,10 +1,28 @@
+// Goldex backend callbacks.
 //
-// Callback Model
+// Goldex can send a number of `POST` callbacks (`application/json`) to your backend.
+// Some callbacks are `synchronous`, which means if the callback is defined it `must` respond with HTTP status `200`.
+// Other callbacks are `asynchronous`: Goldex queues this callback and periodically tries to deliver it, until get HTTP status `200`.
+//
+// Callbacks (see Goldex dashboard for detailed list):
+// 1. Item evaluation just started (sync);
+// 2. Item evaluation finished successfully (async);
+// 3. Storage cell occupation attempt (sync);
+// 4. Storage cell release attempt (sync);
+// 5. Custom named methods accessable for terminal UI (sync).
+//
+// Goldex sends HTTP headers with each callback:
+// 1. `X-CBOT-PROJECT-ID` contains Goldex-world project ID;
+// 2. `X-CBOT-BOT-ID` contains Goldex-world bot ID;
+//
+// Moreover, Goldex signs the callbacks, so you are able to verify it with a per-project public key (see Goldex dashboard).
+//
+// Actual callback payloads are described below in this document.
 //
 // swagger:meta
 package callback
 
-// EvalStarted describes new evaluation that is being just started
+// Describes new evaluation that is being just started
 //
 // swagger:model
 type EvalStarted struct {
@@ -22,7 +40,7 @@ type EvalStarted struct {
 	EvalID uint64 `json:"eval_id"`
 }
 
-// EvalFinished describes evaluation and decision data and is sent only on successful evaluation completion
+// Describes evaluation and decision data and is sent only on successful evaluation completion
 //
 // swagger:model
 type EvalFinished struct {
@@ -85,7 +103,7 @@ type EvalFinished struct {
 	Warnings []string `json:"warnings"`
 }
 
-// EvalFinishedPhoto contains evaluation photo details
+// Contains evaluation photo details
 //
 // swagger:model
 type EvalFinishedPhoto struct {
@@ -103,7 +121,7 @@ type EvalFinishedPhoto struct {
 	Origin string `json:"origin"`
 }
 
-// StorageCellEvent is common data sent in storage related callbacks
+// This is common data sent in a storage related callbacks
 //
 // swagger:model
 type StorageCellEvent struct {
