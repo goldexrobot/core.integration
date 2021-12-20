@@ -105,9 +105,9 @@ type API interface {
 	//   - Evaluation
 	// responses:
 	//   x-jsonrpc-success:
-	//     description: New evaluation ID or a failure
-	//     scheme:
-	//       "$ref": "#/definitions/EvalNewResult"
+	//     description: Result (one of)
+	//     schema:
+	//       $ref: "#/definitions/EvalNewResult"
 	//   default:
 	//     description: JSONRPC error
 	EvalNew() (res EvalNewResult, err error)
@@ -127,9 +127,9 @@ type API interface {
 	//   - Evaluation
 	// responses:
 	//   x-jsonrpc-success:
-	//     description: Spectral evaluation result
-	//     scheme:
-	//       "$ref": "#/definitions/EvalSpectrumResult"
+	//     description: Result (one of)
+	//     schema:
+	//       $ref: "#/definitions/EvalSpectrumResult"
 	//   default:
 	//     description: JSONRPC error
 	EvalSpectrum() (res EvalSpectrumResult, err error)
@@ -150,8 +150,8 @@ type API interface {
 	// responses:
 	//   x-jsonrpc-success:
 	//     description: Hydrostatic evaluation result
-	//     scheme:
-	//       "$ref": "#/definitions/EvalHydroResult"
+	//     schema:
+	//       $ref: "#/definitions/EvalHydroResult"
 	//   default:
 	//     description: JSONRPC error
 	EvalHydro() (res EvalHydroResult, err error)
@@ -188,11 +188,16 @@ type API interface {
 	// - application/json
 	// tags:
 	//   - Evaluation
+	// parameters:
+	//   - in: body
+	//     description: JSONRPC params
+	//     schema:
+	//       $ref: "#/definitions/EvalStoreRequest"
 	// responses:
 	//   x-jsonrpc-success:
-	//     description: Success
-	//     scheme:
-	//       "$ref": "#/definitions/EvalStoreResult"
+	//     description: Result (one of)
+	//     schema:
+	//       $ref: "#/definitions/EvalStoreResult"
 	//   default:
 	//     description: JSONRPC error
 	EvalStore(req EvalStoreRequest) (res EvalStoreResult, err error)
@@ -212,88 +217,361 @@ type API interface {
 	// - application/json
 	// tags:
 	//   - Storage
+	// parameters:
+	//   - in: body
+	//     description: JSONRPC params
+	//     schema:
+	//       $ref: "#/definitions/StorageExtractRequest"
 	// responses:
 	//   x-jsonrpc-success:
-	//     description: No payload
+	//     description: Result (one of)
+	//     schema:
+	//       "$ref": "#/definitions/StorageExtractResult"
 	//   default:
 	//     description: JSONRPC error
-	StorageExtract(req StorageExtractRequest) (err error)
+	StorageExtract(req StorageExtractRequest) (res StorageExtractResult, err error)
+
+	////// OTHER //////
+
+	// swagger:operation POST /connection Connection
+	//
+	// Connection check.
+	//
+	// Checks the internet connection and custom hardware modules are available.
+	// ---
+	// consumes:
+	// - application/json
+	// produces:
+	// - application/json
+	// tags:
+	//   - Other
+	// responses:
+	//   x-jsonrpc-success:
+	//     description: Result
+	//     schema:
+	//       "$ref": "#/definitions/ConnectionResult"
+	//   default:
+	//     description: JSONRPC error
+	Connection() (res ConnectionResult, err error)
+
+	// swagger:operation POST /call Call
+	//
+	// Call named backend method.
+	//
+	// Performs a call to a named backend method defined in Goldex dashboard.
+	// ---
+	// consumes:
+	// - application/json
+	// produces:
+	// - application/json
+	// tags:
+	//   - Other
+	// parameters:
+	//   - in: body
+	//     description: JSONRPC params
+	//     schema:
+	//       $ref: "#/definitions/CallRequest"
+	// responses:
+	//   x-jsonrpc-success:
+	//     description: Result
+	//     schema:
+	//       $ref: "#/definitions/CallResult"
+	//   default:
+	//     description: JSONRPC error
+	Call(req CallRequest) (res CallResult, err error)
+
+	// swagger:operation POST /hardware Hardware
+	//
+	// Call to hardware.
+	//
+	// Call an RPC method of the optional hardware installed within the terminal.
+	// ---
+	// consumes:
+	// - application/json
+	// produces:
+	// - application/json
+	// tags:
+	//   - Other
+	// parameters:
+	//   - in: body
+	//     description: JSONRPC params
+	//     schema:
+	//       $ref: "#/definitions/HardwareRequest"
+	// responses:
+	//   x-jsonrpc-success:
+	//     description: Result
+	//     schema:
+	//       $ref: "#/definitions/HardwareResult"
+	//   default:
+	//     description: JSONRPC error
+	Hardware(req HardwareRequest) (res HardwareResult, err error)
 }
 
-// New evaluation result.
 // swagger:model
 type EvalNewResult struct {
-	Success EvalNewResultSuccess
-	Failure EvalNewResultFailure
+	Success EvalNewResultSuccess `json:"success,omitempty"`
+	Failure EvalNewResultFailure `json:"failure,omitempty"`
 }
 
+// swagger:model
 type EvalNewResultSuccess struct {
-	StorageCell string
+	// evaluation ID
+	//
+	// example: 42
+	EvalID uint64 `json:"eval_id"`
+
+	// allocated storage cell address
+	//
+	// example: A1
+	StorageCell string `json:"storage_cell"`
 }
 
+// swagger:model
 type EvalNewResultFailure struct {
-	NetworkUnavailable bool
-	HardwareCheck      bool
-	NoStorageRoom      bool
+	// one of: network failure (retryable)
+	NetworkUnavailable bool `json:"network_unavailable,omitempty"`
+
+	// one of: primary hardware healthcheck failed (retryable)
+	HardwareCheck bool `json:"hardware_check,omitempty"`
+
+	// one of: no more room in the storage (retryable)
+	NoStorageRoom bool `json:"no_storage_room,omitempty"`
 }
 
-// Spectral evaluation result.
 // swagger:model
 type EvalSpectrumResult struct {
-	Success EvalSpectrumResultSuccess
-	Failure EvalSpectrumResultFailure
+	Success EvalSpectrumResultSuccess `json:"success,omitempty"`
+	Failure EvalSpectrumResultFailure `json:"failure,omitempty"`
 }
 
+// swagger:model
 type EvalSpectrumResultSuccess struct {
-	Alloy      string
-	Purity     float64
-	Millesimal int
-	Carat      string
-	Spectrum   map[string]float64
+	// valuable metal
+	//
+	// example: au
+	Alloy string `json:"alloy"`
+
+	// content of the valuable metal in percents
+	//
+	// example: 58.5
+	Purity float64 `json:"purity"`
+
+	// millesimal fineness, 585 stands for 58.5%, 999 for 99.9%, 9999 for 99.99%
+	//
+	// example: 585
+	Millesimal int `json:"millesimal"`
+
+	// fineness in carats
+	//
+	// example: 14K
+	Carat string `json:"carat"`
+
+	// spectrum data
+	//
+	// example: {"au":58.5,"cu":14.2}
+	Spectrum map[string]float64 `json:"spectrum"`
 }
 
+// swagger:model
 type EvalSpectrumResultFailure struct {
-	NetworkUnavailable bool
-	EvalRejected       bool
+	// one of: network failure (fatal)
+	NetworkUnavailable bool `json:"network_unavailable,omitempty"`
+	// one of: no valuable metal found, evaluation is rejected by the backend and should be returned back to customer (fatal)
+	EvalRejected bool `json:"eval_rejected,omitempty"`
 }
 
-// Hydrostatic evaluation result.
 // swagger:model
 type EvalHydroResult struct {
-	Success EvalHydroResultSuccess
-	Failure EvalHydroResultFailure
+	Success EvalHydroResultSuccess `json:"success,omitempty"`
+	Failure EvalHydroResultFailure `json:"failure,omitempty"`
 }
 
+// swagger:model
 type EvalHydroResultSuccess struct {
-	Alloy      string
-	Purity     float64
-	Millesimal int
-	Carat      string
-	Weight     float64
-	Confidence float64
-	Risky      bool
+	// valuable metal
+	//
+	// example: au
+	Alloy string `json:"alloy"`
+
+	// content of the valuable metal in percents
+	//
+	// example: 58.5
+	Purity float64 `json:"purity"`
+
+	// millesimal fineness, 585 stands for 58.5%, 999 for 99.9%, 9999 for 99.99%
+	//
+	// example: 585
+	Millesimal int `json:"millesimal"`
+
+	// fineness in carats
+	//
+	// example: 14K
+	Carat string `json:"carat"`
+
+	// weight in grams
+	//
+	// example: 3.141
+	Weight float64 `json:"weight"`
+
+	// evaluation confidence, 1.0 - is confident, 0.0 - is not, 0.8 - is "pretty" confident
+	//
+	// example: 0.913
+	Confidence float64 `json:"confidence"`
+
+	// automatic decision result
+	Risky bool `json:"risky"`
 }
 
+// swagger:model
 type EvalHydroResultFailure struct {
-	NetworkUnavailable bool
-	EvalRejected       bool
-	UnstableScale      bool
+	// one of: network failure (fatal)
+	NetworkUnavailable bool `json:"network_unavailable,omitempty"`
+
+	// one of: no valuable metal found, evaluation is rejected by the backend and should be returned back to customer (fatal)
+	EvalRejected bool `json:"eval_rejected,omitempty"`
+
+	// one of: weighing scale is affected by a mechanical vibration (fatal)
+	UnstableScale bool `json:"unstable_scale,omitempty"`
 }
 
-// Item storing request.
 // swagger:model
 type EvalStoreRequest struct {
-	// TODO:
+	// occupation domain: `buyout`, `pawnshop` or `other`
+	//
+	// example: buyout
+	Domain string `json:"domain"`
 }
 
-// Item storing result.
 // swagger:model
 type EvalStoreResult struct {
-	// TODO:
+	Success EvalStoreResultSuccess `json:"success,omitempty"`
+	Failure EvalStoreResultFailure `json:"failure,omitempty"`
 }
 
-// Item extraction request.
+// swagger:model
+type EvalStoreResultSuccess struct {
+	// cell address
+	//
+	// example: A1
+	Cell string `json:"cell"`
+
+	// storing identity
+	//
+	// example: 6c8ec8b3e88b4fcaac47f781f5e6343e
+	Transaction string `json:"transaction"`
+}
+
+// swagger:model
+type EvalStoreResultFailure struct {
+	// one of: network failure (retryable)
+	NetworkUnavailable bool `json:"network_unavailable,omitempty"`
+
+	// one of: storing is forbidden
+	Forbidden bool `json:"forbidden,omitempty"`
+}
+
 // swagger:model
 type StorageExtractRequest struct {
-	// TODO:
+	// cell address
+	//
+	// example: A1
+	Cell string `json:"cell"`
+
+	// occupation domain: `pawnshop`, `shop` or `other`
+	//
+	// example: shop
+	Domain string `json:"domain"`
+}
+
+// swagger:model
+type StorageExtractResult struct {
+	Success StorageExtractResultSuccess `json:"success,omitempty"`
+	Failure StorageExtractResultFailure `json:"failure,omitempty"`
+}
+
+// swagger:model
+type StorageExtractResultSuccess struct {
+	// extraction identity
+	//
+	// example: 6c8ec8b3e88b4fcaac47f781f5e6343e
+	Transaction string `json:"transaction"`
+}
+
+// swagger:model
+type StorageExtractResultFailure struct {
+	// one of: network failure (retryable)
+	NetworkUnavailable bool `json:"network_unavailable,omitempty"`
+
+	// one of: extraction is forbidden
+	Forbidden bool `json:"forbidden,omitempty"`
+}
+
+// swagger:model
+type ConnectionResult struct {
+	// internet connectivity
+	//
+	// example: true
+	Internet bool `json:"internet"`
+
+	// available hardware
+	//
+	// example: {"my-pos":true,"my-printer":true}
+	Hardware map[string]bool `json:"hardware"`
+}
+
+// swagger:model
+type CallRequest struct {
+	// method name
+	//
+	// example: my-method
+	Method string `json:"method"`
+
+	// request key-value
+	//
+	// example: {"foo":"bar","bar":["baz","qux"]}
+	Body map[string]interface{} `json:"body"`
+}
+
+// swagger:model
+type CallResult struct {
+	// http status
+	//
+	// example: 200
+	HttpStatus int `json:"http_status"`
+
+	// result key-value
+	//
+	// example: {"foo":"bar","bar":["baz","qux"]}
+	Body map[string]interface{} `json:"body"`
+}
+
+// swagger:model
+type HardwareRequest struct {
+	// named hardware
+	//
+	// example: my-pos
+	Hardware string `json:"hardware"`
+
+	// method name
+	//
+	// example: my-method
+	Method string `json:"method"`
+
+	// request key-value
+	//
+	// example: {"foo":"bar","bar":["baz","qux"]}
+	Request map[string]interface{} `json:"request"`
+}
+
+// swagger:model
+type HardwareResult struct {
+	// result key-value
+	//
+	// example: {"foo":"bar","bar":["baz","qux"]}
+	Result map[string]interface{} `json:"result"`
+
+	// hardware specific error
+	//
+	// example: optional failure description
+	Error string `json:"error,omitempty"`
 }

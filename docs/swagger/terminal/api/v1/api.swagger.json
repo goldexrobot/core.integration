@@ -17,6 +17,69 @@
   "host": "localhost:80",
   "basePath": "/ws",
   "paths": {
+    "/call": {
+      "post": {
+        "description": "Performs a call to a named backend method defined in Goldex dashboard.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Other"
+        ],
+        "summary": "Call named backend method.",
+        "operationId": "Call",
+        "parameters": [
+          {
+            "description": "JSONRPC params",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CallRequest"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Result",
+            "schema": {
+              "$ref": "#/definitions/CallResult"
+            }
+          }
+        }
+      }
+    },
+    "/connection": {
+      "post": {
+        "description": "Checks the internet connection and custom hardware modules are available.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Other"
+        ],
+        "summary": "Connection check.",
+        "operationId": "Connection",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Result",
+            "schema": {
+              "$ref": "#/definitions/ConnectionResult"
+            }
+          }
+        }
+      }
+    },
     "/eval.hydro": {
       "post": {
         "description": "Starts a hydrostatic evaluation of the item. Should be called right after `eval.spectrum`.\nOn successful hydrostatic evaluation the item might be returned back to customer with `eval.return`.",
@@ -37,7 +100,7 @@
           },
           "x-jsonrpc-success": {
             "description": "Hydrostatic evaluation result",
-            "scheme": {
+            "schema": {
               "$ref": "#/definitions/EvalHydroResult"
             }
           }
@@ -63,8 +126,8 @@
             "description": "JSONRPC error"
           },
           "x-jsonrpc-success": {
-            "description": "New evaluation ID or a failure",
-            "scheme": {
+            "description": "Result (one of)",
+            "schema": {
               "$ref": "#/definitions/EvalNewResult"
             }
           }
@@ -73,7 +136,7 @@
     },
     "/eval.return": {
       "post": {
-        "description": "Starts a returning process of the item. Should be called only on successful spectral/hydrostatic evaluation.\nOn successful returning outlet window should be closed manually: customer choice (preferred) or a timeout.",
+        "description": "Starts a returning process of the item. Should be called after spectral/hydrostatic evaluation.\nOn successful returning outlet window should be closed manually: customer choice (preferred) or a timeout.",
         "consumes": [
           "application/json"
         ],
@@ -114,8 +177,8 @@
             "description": "JSONRPC error"
           },
           "x-jsonrpc-success": {
-            "description": "Spectral evaluation result",
-            "scheme": {
+            "description": "Result (one of)",
+            "schema": {
               "$ref": "#/definitions/EvalSpectrumResult"
             }
           }
@@ -136,14 +199,59 @@
         ],
         "summary": "Store item [IV].",
         "operationId": "EvalStore",
+        "parameters": [
+          {
+            "description": "JSONRPC params",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/EvalStoreRequest"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "JSONRPC error"
           },
           "x-jsonrpc-success": {
-            "description": "Success",
-            "scheme": {
+            "description": "Result (one of)",
+            "schema": {
               "$ref": "#/definitions/EvalStoreResult"
+            }
+          }
+        }
+      }
+    },
+    "/hardware": {
+      "post": {
+        "description": "Call an RPC method of the optional hardware installed within the terminal.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Other"
+        ],
+        "summary": "Call to hardware.",
+        "operationId": "Hardware",
+        "parameters": [
+          {
+            "description": "JSONRPC params",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/HardwareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Result",
+            "schema": {
+              "$ref": "#/definitions/HardwareResult"
             }
           }
         }
@@ -235,24 +343,138 @@
         ],
         "summary": "Extract item.",
         "operationId": "StorageExtract",
+        "parameters": [
+          {
+            "description": "JSONRPC params",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/StorageExtractRequest"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "JSONRPC error"
           },
           "x-jsonrpc-success": {
-            "description": "No payload"
+            "description": "Result (one of)",
+            "schema": {
+              "$ref": "#/definitions/StorageExtractResult"
+            }
           }
         }
       }
     }
   },
   "definitions": {
+    "CallRequest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "request key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Body",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        },
+        "method": {
+          "description": "method name",
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "my-method"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "CallResult": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "result key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Body",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        },
+        "http_status": {
+          "description": "http status",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "HttpStatus",
+          "example": 200
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "ConnectionResult": {
+      "type": "object",
+      "properties": {
+        "hardware": {
+          "description": "available hardware",
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "x-go-name": "Hardware",
+          "example": {
+            "my-pos": true,
+            "my-printer": true
+          }
+        },
+        "internet": {
+          "description": "internet connectivity",
+          "type": "boolean",
+          "x-go-name": "Internet",
+          "example": true
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
     "EvalHydroResult": {
       "type": "object",
-      "title": "Hydrostatic evaluation result.",
       "properties": {
-        "Success": {
+        "failure": {
+          "$ref": "#/definitions/EvalHydroResultFailure"
+        },
+        "success": {
           "$ref": "#/definitions/EvalHydroResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalHydroResultFailure": {
+      "type": "object",
+      "properties": {
+        "eval_rejected": {
+          "description": "one of: no valuable metal found, evaluation is rejected by the backend and should be returned back to customer (fatal)",
+          "type": "boolean",
+          "x-go-name": "EvalRejected"
+        },
+        "network_unavailable": {
+          "description": "one of: network failure (fatal)",
+          "type": "boolean",
+          "x-go-name": "NetworkUnavailable"
+        },
+        "unstable_scale": {
+          "description": "one of: weighing scale is affected by a mechanical vibration (fatal)",
+          "type": "boolean",
+          "x-go-name": "UnstableScale"
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
@@ -261,51 +483,129 @@
       "type": "object",
       "properties": {
         "alloy": {
+          "description": "valuable metal",
           "type": "string",
-          "x-go-name": "Alloy"
+          "x-go-name": "Alloy",
+          "example": "au"
         },
         "carat": {
+          "description": "fineness in carats",
           "type": "string",
-          "x-go-name": "Carat"
+          "x-go-name": "Carat",
+          "example": "14K"
         },
         "confidence": {
+          "description": "evaluation confidence, 1.0 - is confident, 0.0 - is not, 0.8 - is \"pretty\" confident",
           "type": "number",
           "format": "double",
-          "x-go-name": "Confidence"
+          "x-go-name": "Confidence",
+          "example": 0.913
         },
         "millesimal": {
+          "description": "millesimal fineness, 585 stands for 58.5%, 999 for 99.9%, 9999 for 99.99%",
           "type": "integer",
           "format": "int64",
-          "x-go-name": "Millesimal"
+          "x-go-name": "Millesimal",
+          "example": 585
         },
         "purity": {
+          "description": "content of the valuable metal in percents",
           "type": "number",
           "format": "double",
-          "x-go-name": "Purity"
+          "x-go-name": "Purity",
+          "example": 58.5
         },
         "risky": {
+          "description": "automatic decision result",
           "type": "boolean",
           "x-go-name": "Risky"
         },
         "weight": {
+          "description": "weight in grams",
           "type": "number",
           "format": "double",
-          "x-go-name": "Weight"
+          "x-go-name": "Weight",
+          "example": 3.141
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
     "EvalNewResult": {
       "type": "object",
-      "title": "New evaluation result.",
+      "properties": {
+        "failure": {
+          "$ref": "#/definitions/EvalNewResultFailure"
+        },
+        "success": {
+          "$ref": "#/definitions/EvalNewResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalNewResultFailure": {
+      "type": "object",
+      "properties": {
+        "hardware_check": {
+          "description": "one of: primary hardware healthcheck failed (retryable)",
+          "type": "boolean",
+          "x-go-name": "HardwareCheck"
+        },
+        "network_unavailable": {
+          "description": "one of: network failure (retryable)",
+          "type": "boolean",
+          "x-go-name": "NetworkUnavailable"
+        },
+        "no_storage_room": {
+          "description": "one of: no more room in the storage (retryable)",
+          "type": "boolean",
+          "x-go-name": "NoStorageRoom"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalNewResultSuccess": {
+      "type": "object",
+      "properties": {
+        "eval_id": {
+          "description": "evaluation ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "EvalID",
+          "example": 42
+        },
+        "storage_cell": {
+          "description": "allocated storage cell address",
+          "type": "string",
+          "x-go-name": "StorageCell",
+          "example": "A1"
+        }
+      },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
     "EvalSpectrumResult": {
       "type": "object",
-      "title": "Spectral evaluation result.",
       "properties": {
-        "Success": {
+        "failure": {
+          "$ref": "#/definitions/EvalSpectrumResultFailure"
+        },
+        "success": {
           "$ref": "#/definitions/EvalSpectrumResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalSpectrumResultFailure": {
+      "type": "object",
+      "properties": {
+        "eval_rejected": {
+          "description": "one of: no valuable metal found, evaluation is rejected by the backend and should be returned back to customer (fatal)",
+          "type": "boolean",
+          "x-go-name": "EvalRejected"
+        },
+        "network_unavailable": {
+          "description": "one of: network failure (fatal)",
+          "type": "boolean",
+          "x-go-name": "NetworkUnavailable"
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
@@ -314,39 +614,221 @@
       "type": "object",
       "properties": {
         "alloy": {
+          "description": "valuable metal",
           "type": "string",
-          "x-go-name": "Alloy"
+          "x-go-name": "Alloy",
+          "example": "au"
         },
         "carat": {
+          "description": "fineness in carats",
           "type": "string",
-          "x-go-name": "Carat"
+          "x-go-name": "Carat",
+          "example": "14K"
         },
         "millesimal": {
+          "description": "millesimal fineness, 585 stands for 58.5%, 999 for 99.9%, 9999 for 99.99%",
           "type": "integer",
           "format": "int64",
-          "x-go-name": "Millesimal"
+          "x-go-name": "Millesimal",
+          "example": 585
         },
         "purity": {
+          "description": "content of the valuable metal in percents",
           "type": "number",
           "format": "double",
-          "x-go-name": "Purity"
+          "x-go-name": "Purity",
+          "example": 58.5
+        },
+        "spectrum": {
+          "description": "spectrum data",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "x-go-name": "Spectrum",
+          "example": {
+            "au": 58.5,
+            "cu": 14.2
+          }
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
     "EvalStoreRequest": {
       "type": "object",
-      "title": "Item storing request.",
+      "properties": {
+        "domain": {
+          "description": "occupation domain: `buyout`, `pawnshop` or `other`",
+          "type": "string",
+          "x-go-name": "Domain",
+          "example": "buyout"
+        }
+      },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
     "EvalStoreResult": {
       "type": "object",
-      "title": "Item storing result.",
+      "properties": {
+        "failure": {
+          "$ref": "#/definitions/EvalStoreResultFailure"
+        },
+        "success": {
+          "$ref": "#/definitions/EvalStoreResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalStoreResultFailure": {
+      "type": "object",
+      "properties": {
+        "forbidden": {
+          "description": "one of: storing is forbidden",
+          "type": "boolean",
+          "x-go-name": "Forbidden"
+        },
+        "network_unavailable": {
+          "description": "one of: network failure (retryable)",
+          "type": "boolean",
+          "x-go-name": "NetworkUnavailable"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "EvalStoreResultSuccess": {
+      "type": "object",
+      "properties": {
+        "cell": {
+          "description": "cell address",
+          "type": "string",
+          "x-go-name": "Cell",
+          "example": "A1"
+        },
+        "transaction": {
+          "description": "storing identity",
+          "type": "string",
+          "x-go-name": "Transaction",
+          "example": "6c8ec8b3e88b4fcaac47f781f5e6343e"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "HardwareRequest": {
+      "type": "object",
+      "properties": {
+        "hardware": {
+          "description": "named hardware",
+          "type": "string",
+          "x-go-name": "Hardware",
+          "example": "my-pos"
+        },
+        "method": {
+          "description": "method name",
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "my-method"
+        },
+        "request": {
+          "description": "request key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Request",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "HardwareResult": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "hardware specific error",
+          "type": "string",
+          "x-go-name": "Error",
+          "example": "optional failure description"
+        },
+        "result": {
+          "description": "result key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Result",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        }
+      },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
     "StorageExtractRequest": {
       "type": "object",
-      "title": "Item extraction request.",
+      "properties": {
+        "cell": {
+          "description": "cell address",
+          "type": "string",
+          "x-go-name": "Cell",
+          "example": "A1"
+        },
+        "domain": {
+          "description": "occupation domain: `pawnshop`, `shop` or `other`",
+          "type": "string",
+          "x-go-name": "Domain",
+          "example": "shop"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "StorageExtractResult": {
+      "type": "object",
+      "properties": {
+        "failure": {
+          "$ref": "#/definitions/StorageExtractResultFailure"
+        },
+        "success": {
+          "$ref": "#/definitions/StorageExtractResultSuccess"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "StorageExtractResultFailure": {
+      "type": "object",
+      "properties": {
+        "forbidden": {
+          "description": "one of: extraction is forbidden",
+          "type": "boolean",
+          "x-go-name": "Forbidden"
+        },
+        "network_unavailable": {
+          "description": "one of: network failure (retryable)",
+          "type": "boolean",
+          "x-go-name": "NetworkUnavailable"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "StorageExtractResultSuccess": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "description": "extraction identity",
+          "type": "string",
+          "x-go-name": "Transaction",
+          "example": "6c8ec8b3e88b4fcaac47f781f5e6343e"
+        }
+      },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     }
   }
