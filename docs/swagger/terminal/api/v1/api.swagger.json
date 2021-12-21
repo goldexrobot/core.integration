@@ -10,7 +10,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Goldex Robot terminal serves JSONRPC 2 API and accepts Websocket connections on localhost\\:80\\/ws. Websocket messages are textual, not binary.\n\nHow to read the document.\nThis doc is generated according to OpenAPI 2, so JSONRPC methods are defined as POST methods. Actual method name is defined after slash symbol.\nFor example\\:\n\n`\"POST /inlet.open\"`\n\nmeans JSONRPC request\n\n`{\"version\":\"2.0\",\"id\":1,\"method\":\"inlet.open\",\"params\":{...}}`",
+    "description": "Goldex Robot terminal serves JSONRPC 2 API and accepts Websocket connections on localhost\\:80\\/ws. Websocket messages are textual, not binary.\n\nHow to read the document.\nThis doc is generated according to OpenAPI 2, so JSONRPC methods are defined as POST methods. Actual method name is defined after slash symbol.\nFor example\\:\n\n`\"POST /inlet.open\"`\n\nmeans JSONRPC request\n\n`{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"inlet.open\",\"params\":{...}}`",
     "title": "Terminal JSONRPC API.",
     "version": "1.0.0"
   },
@@ -48,33 +48,6 @@
             "description": "Result",
             "schema": {
               "$ref": "#/definitions/CallResult"
-            }
-          }
-        }
-      }
-    },
-    "/connection": {
-      "post": {
-        "description": "Checks the internet connection and custom hardware modules are available.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Other"
-        ],
-        "summary": "Connection check.",
-        "operationId": "Connection",
-        "responses": {
-          "default": {
-            "description": "JSONRPC error"
-          },
-          "x-jsonrpc-success": {
-            "description": "Result",
-            "schema": {
-              "$ref": "#/definitions/ConnectionResult"
             }
           }
         }
@@ -329,6 +302,33 @@
         }
       }
     },
+    "/status": {
+      "post": {
+        "description": "Reports current status: operational status, internet connectivity, optional hardware health.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Other"
+        ],
+        "summary": "Current status.",
+        "operationId": "Status",
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Result",
+            "schema": {
+              "$ref": "#/definitions/StatusResult"
+            }
+          }
+        }
+      }
+    },
     "/storage.extract": {
       "post": {
         "description": "Requires hardware to extract an item from the specified storage cell and bring it to the outlet window.\nOn successful extraction the outlet window should be closed manually: customer choice (preferred) or a timeout.",
@@ -418,30 +418,6 @@
           "format": "int64",
           "x-go-name": "HttpStatus",
           "example": 200
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
-    "ConnectionResult": {
-      "type": "object",
-      "properties": {
-        "hardware": {
-          "description": "available hardware",
-          "type": "object",
-          "additionalProperties": {
-            "type": "boolean"
-          },
-          "x-go-name": "Hardware",
-          "example": {
-            "my-pos": true,
-            "my-printer": true
-          }
-        },
-        "internet": {
-          "description": "internet connectivity",
-          "type": "boolean",
-          "x-go-name": "Internet",
-          "example": true
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
@@ -716,25 +692,13 @@
     "HardwareRequest": {
       "type": "object",
       "properties": {
-        "hardware": {
-          "description": "named hardware",
-          "type": "string",
-          "x-go-name": "Hardware",
-          "example": "my-pos"
-        },
-        "method": {
-          "description": "method name",
-          "type": "string",
-          "x-go-name": "Method",
-          "example": "my-method"
-        },
-        "request": {
+        "data": {
           "description": "request key-value",
           "type": "object",
           "additionalProperties": {
             "type": "object"
           },
-          "x-go-name": "Request",
+          "x-go-name": "Data",
           "example": {
             "bar": [
               "baz",
@@ -742,6 +706,18 @@
             ],
             "foo": "bar"
           }
+        },
+        "method": {
+          "description": "method name",
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "my-method"
+        },
+        "name": {
+          "description": "named hardware",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "my-pos"
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
@@ -768,6 +744,36 @@
               "qux"
             ],
             "foo": "bar"
+          }
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "StatusResult": {
+      "type": "object",
+      "properties": {
+        "internet_connection": {
+          "description": "internet connectivity",
+          "type": "boolean",
+          "x-go-name": "InternetConnection",
+          "example": true
+        },
+        "operational": {
+          "description": "operational status",
+          "type": "boolean",
+          "x-go-name": "Operational",
+          "example": true
+        },
+        "optional_hardware": {
+          "description": "available optional hardware",
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "x-go-name": "OptionalHardware",
+          "example": {
+            "my-pos": true,
+            "my-printer": true
           }
         }
       },
