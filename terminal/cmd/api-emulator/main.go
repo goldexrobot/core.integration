@@ -64,28 +64,6 @@ func main() {
 	// api controller
 	ctl := api.NewController(logger.WithField("api", "ctl"))
 
-	// console?
-	if con != nil {
-		// "reading" event from console
-		consoleReading := make(chan struct{}, 1)
-		defer close(consoleReading)
-
-		// serve console
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			defer cancel()
-			con.Printf(`Welcome to Goldex terminal emulator. Try %v`, color.CyanString("help"))
-			con.Run(ctx, &activity.Main{
-				Logger: logger.WithField("activity", "main"),
-				Ctl:    ctl,
-			}, "", consoleReading)
-		}()
-
-		// wait console
-		<-consoleReading
-	}
-
 	// api server: websocket + jsonrpc
 	srv, err := api.NewServer(
 		int(*argPort),
@@ -97,13 +75,37 @@ func main() {
 		return
 	}
 
+	srvReadiness := make(chan struct{}, 1)
+	defer close(srvReadiness)
+
 	// serve http
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer cancel()
-		srv.Serve(ctx)
+		srv.Serve(ctx, srvReadiness)
 	}()
+
+	select {
+	case <-ctx.Done():
+		return
+	case <-srvReadiness:
+	}
+
+	// console?
+	if con != nil {
+		// serve console
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer cancel()
+			con.Printf(`Welcome to Goldex terminal emulator. Try %v`, color.CyanString("help"))
+			con.Run(ctx, &activity.Main{
+				Logger: logger.WithField("activity", "main"),
+				Ctl:    ctl,
+			}, "")
+		}()
+	}
 
 	wg.Wait()
 }

@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 )
 
@@ -68,5 +67,5 @@ func (h LogrusConsoleHook) data(e *logrus.Entry) string {
 		sw.WriteString("] ")
 	}
 
-	return "   " + color.HiBlackString(strings.TrimSpace(sw.String()))
+	return "   " + strings.TrimSpace(sw.String())
 }

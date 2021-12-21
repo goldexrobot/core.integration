@@ -54,7 +54,7 @@ func (c *Console) Printf(f string, args ...interface{}) {
 
 // Debugf prints!
 func (c *Console) Debugf(f string, args ...interface{}) {
-	c.Printf(color.HiBlackString(fmt.Sprintf(f, args...)))
+	c.Printf(fmt.Sprintf(f, args...))
 }
 
 // Infof prints!
@@ -132,7 +132,7 @@ func (c *Console) pop() {
 }
 
 // Run console loop
-func (c *Console) Run(ctx context.Context, root Activity, prompt string, reading chan<- struct{}) {
+func (c *Console) Run(ctx context.Context, root Activity, prompt string) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -171,10 +171,6 @@ func (c *Console) Run(ctx context.Context, root Activity, prompt string, reading
 		c.SetPrompt(color.CyanString(actx.prompt + "> "))
 
 		// wait input
-		select {
-		case reading <- struct{}{}:
-		default:
-		}
 		line, err := c.Readline()
 		switch {
 		case err == readline.ErrInterrupt:

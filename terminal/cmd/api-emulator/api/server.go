@@ -39,7 +39,7 @@ func NewServer(port int, a *apiv1.Impl, logger *logrus.Entry) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) Serve(ctx context.Context) {
+func (s *Server) Serve(ctx context.Context, ready chan<- struct{}) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -78,6 +78,7 @@ func (s *Server) Serve(ctx context.Context) {
 
 	s.logger.Infof("Websocket handler at %v/ws", s.lis.Addr())
 
+	ready <- struct{}{}
 	wg.Wait()
 }
 

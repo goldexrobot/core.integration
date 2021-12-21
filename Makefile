@@ -13,3 +13,10 @@ backend:
 terminal:
 	$(info Terminal:)
 	@$(MAKE) --no-print-directory -C terminal
+
+.PHONY: dist
+dist:
+	@mkdir -p ./dist
+	GOOS=windows GOARCH=amd64 go build -tags "-w -s" -o ./dist/tapi-emu-windows.exe ./terminal/cmd/api-emulator/main.go
+	GOOS=linux GOARCH=amd64 go build -tags "-w -s" -o ./dist/tapi-emu-linux ./terminal/cmd/api-emulator/main.go
+	GOOS=darwin GOARCH=amd64 go build -tags "-w -s" -o ./dist/tapi-emu-darwin ./terminal/cmd/api-emulator/main.go
