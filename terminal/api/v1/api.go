@@ -10,7 +10,7 @@
 //
 // means JSONRPC request
 //
-// `{"version":"2.0","id":1,"method":"inlet.open","params":{...}}`
+// `{"jsonrpc":"2.0","id":1,"method":"inlet.open","params":{...}}`
 //
 //     Schemes: ws
 //     Host: localhost:80
@@ -233,11 +233,11 @@ type API interface {
 
 	////// OTHER //////
 
-	// swagger:operation POST /connection Connection
+	// swagger:operation POST /status Status
 	//
-	// Connection check.
+	// Current status.
 	//
-	// Checks the internet connection and custom hardware modules are available.
+	// Reports current status: operational status, internet connectivity, optional hardware health.
 	// ---
 	// consumes:
 	// - application/json
@@ -249,10 +249,10 @@ type API interface {
 	//   x-jsonrpc-success:
 	//     description: Result
 	//     schema:
-	//       "$ref": "#/definitions/ConnectionResult"
+	//       "$ref": "#/definitions/StatusResult"
 	//   default:
 	//     description: JSONRPC error
-	Connection() (res ConnectionResult, err error)
+	Status() (res StatusResult, err error)
 
 	// swagger:operation POST /call Call
 	//
@@ -309,8 +309,8 @@ type API interface {
 
 // swagger:model
 type EvalNewResult struct {
-	Success EvalNewResultSuccess `json:"success,omitempty"`
-	Failure EvalNewResultFailure `json:"failure,omitempty"`
+	Success *EvalNewResultSuccess `json:"success,omitempty"`
+	Failure *EvalNewResultFailure `json:"failure,omitempty"`
 }
 
 // swagger:model
@@ -340,8 +340,8 @@ type EvalNewResultFailure struct {
 
 // swagger:model
 type EvalSpectrumResult struct {
-	Success EvalSpectrumResultSuccess `json:"success,omitempty"`
-	Failure EvalSpectrumResultFailure `json:"failure,omitempty"`
+	Success *EvalSpectrumResultSuccess `json:"success,omitempty"`
+	Failure *EvalSpectrumResultFailure `json:"failure,omitempty"`
 }
 
 // swagger:model
@@ -382,8 +382,8 @@ type EvalSpectrumResultFailure struct {
 
 // swagger:model
 type EvalHydroResult struct {
-	Success EvalHydroResultSuccess `json:"success,omitempty"`
-	Failure EvalHydroResultFailure `json:"failure,omitempty"`
+	Success *EvalHydroResultSuccess `json:"success,omitempty"`
+	Failure *EvalHydroResultFailure `json:"failure,omitempty"`
 }
 
 // swagger:model
@@ -439,13 +439,13 @@ type EvalStoreRequest struct {
 	// occupation domain: `buyout`, `pawnshop` or `other`
 	//
 	// example: buyout
-	Domain string `json:"domain"`
+	Domain string `json:"domain" validate:"oneof=buyout pawnshop other"`
 }
 
 // swagger:model
 type EvalStoreResult struct {
-	Success EvalStoreResultSuccess `json:"success,omitempty"`
-	Failure EvalStoreResultFailure `json:"failure,omitempty"`
+	Success *EvalStoreResultSuccess `json:"success,omitempty"`
+	Failure *EvalStoreResultFailure `json:"failure,omitempty"`
 }
 
 // swagger:model
@@ -475,18 +475,18 @@ type StorageExtractRequest struct {
 	// cell address
 	//
 	// example: A1
-	Cell string `json:"cell"`
+	Cell string `json:"cell" validate:"required,uppercase,min=2,max=4"`
 
 	// occupation domain: `pawnshop`, `shop` or `other`
 	//
 	// example: shop
-	Domain string `json:"domain"`
+	Domain string `json:"domain" validate:"oneof=pawnshop shop other"`
 }
 
 // swagger:model
 type StorageExtractResult struct {
-	Success StorageExtractResultSuccess `json:"success,omitempty"`
-	Failure StorageExtractResultFailure `json:"failure,omitempty"`
+	Success *StorageExtractResultSuccess `json:"success,omitempty"`
+	Failure *StorageExtractResultFailure `json:"failure,omitempty"`
 }
 
 // swagger:model
@@ -507,16 +507,21 @@ type StorageExtractResultFailure struct {
 }
 
 // swagger:model
-type ConnectionResult struct {
+type StatusResult struct {
+	// operational status
+	//
+	// example: true
+	Operational bool `json:"operational"`
+
 	// internet connectivity
 	//
 	// example: true
-	Internet bool `json:"internet"`
+	InternetConnection bool `json:"internet_connection"`
 
-	// available hardware
+	// available optional hardware
 	//
 	// example: {"my-pos":true,"my-printer":true}
-	Hardware map[string]bool `json:"hardware"`
+	OptionalHardware map[string]bool `json:"optional_hardware"`
 }
 
 // swagger:model
@@ -524,7 +529,7 @@ type CallRequest struct {
 	// method name
 	//
 	// example: my-method
-	Method string `json:"method"`
+	Method string `json:"method" validate:"required,max=128"`
 
 	// request key-value
 	//
@@ -550,17 +555,17 @@ type HardwareRequest struct {
 	// named hardware
 	//
 	// example: my-pos
-	Hardware string `json:"hardware"`
+	Name string `json:"name" validate:"required"`
 
 	// method name
 	//
 	// example: my-method
-	Method string `json:"method"`
+	Method string `json:"method" validate:"required"`
 
 	// request key-value
 	//
 	// example: {"foo":"bar","bar":["baz","qux"]}
-	Request map[string]interface{} `json:"request"`
+	Data map[string]interface{} `json:"data"`
 }
 
 // swagger:model

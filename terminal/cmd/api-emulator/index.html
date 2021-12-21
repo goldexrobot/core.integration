@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Terminal API Test</title>
+</head>
+
+<body onload="init()">
+
+	<div style="display: flex; flex-direction: column; align-items: center;">
+		<div>Begin evaluation</div>
+		&darr;
+		<button type="button" onclick="send('status')">status</button>
+		&darr;
+		<button type="button" onclick="send('eval.new')">eval.new</button>
+		&darr;
+		<button type="button" onclick="send('inlet.open')">inlet.open</button>
+		&darr;
+		<button type="button" onclick="send('inlet.close')">inlet.close</button>
+		&darr;
+		<button type="button" onclick="send('eval.spectrum')">eval.spectrum</button>
+		&darr;
+		<button type="button" onclick="send('eval.hydro')">eval.hydro</button>
+		<div style="display: flex; flex-direction: row;">
+			<div style="display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; margin-right: 0.5rem;">
+				<span>&swarr;</span>
+				<button type="button" onclick="send('eval.return')">eval.return</button>
+				<span>&darr;</span>
+				<button type="button" onclick="send('outlet.close')">outlet.close</button>
+				<span>&searr;</span>
+			</div>
+			<div style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; margin-left: 0.5rem;">
+				<span>&searr;</span>
+				<button type="button" onclick="send('eval.store', {domain: 'buyout'})">eval.store</button>
+				<span>&swarr;</span>
+			</div>
+		</div>
+		<div>End evaluation</div>
+		<br><br><br>
+		<button type="button" onclick="send('storage.extract', {cell: 'A1', domain: 'shop'})">storage.extract</button>
+		<br>
+		<button type="button" onclick="send('call', {method: 'my-method', body: {foo: 'bar'}})">call</button>
+		<br>
+		<button type="button" onclick="send('hardware', {name: 'my-hardware', method: 'my-method', data: {foo: 'bar'}})">hardware</button>
+	</div>
+
+	<script src="./rpc.js"></script>
+	<script>
+		const wsAddress = 'ws://localhost:8080/ws';
+		let rpc = null;
+
+		function send(method, params) {
+			rpc.request(method, !!params ? params : null).then(res => {
+				console.log(method, ' => ', res);
+			}).catch(err => {
+				console.error(err);
+			})
+		}
+
+		function init() {
+			rpc = window.rpc(wsAddress, {
+				onConnected: () => {
+					console.info('Connected!');
+				},
+				onDisconnected: () => {
+					console.info('Disconnected!');
+				},
+				onEvent: (method, params) => {
+					console.info('Event!', method, params)
+				},
+			});
+		}
+	</script>
+</body>
+
+</html>
