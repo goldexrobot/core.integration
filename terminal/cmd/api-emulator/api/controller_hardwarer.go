@@ -2,9 +2,11 @@ package api
 
 import (
 	"errors"
+	"strings"
 	"sync/atomic"
 
 	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
+	"github.com/google/uuid"
 )
 
 ////// MODULE IMPL //////
@@ -186,7 +188,11 @@ func (c *Controller) IntegrationUIMethod(method string, body map[string]interfac
 	return
 }
 
-func (c *Controller) UploadEvalCustomerPhoto() {
+func (c *Controller) UploadFrontalCameraPhotoForEval() {
+}
+
+func (c *Controller) UploadFrontalCameraPhoto() (fileID string, err error) {
+	return strings.ReplaceAll(uuid.NewString(), "-", ""), nil
 }
 
 func (c *Controller) InternetConnectivity() (ok bool) {

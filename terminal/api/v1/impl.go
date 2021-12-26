@@ -71,10 +71,11 @@ type Hardwarer interface {
 	StorageReleaseCell(cell, domain, tx string) (netFail, forbidden bool, err error)
 
 	IntegrationUIMethod(method string, body map[string]interface{}) (httpStatus int, response map[string]interface{}, err error)
-	UploadEvalCustomerPhoto()
 	InternetConnectivity() (ok bool)
 	OptionalHardwareHealthcheck() (health map[string]bool, err error)
 	OptionalHardwareRPC(module, method string, request map[string]interface{}) (result map[string]interface{}, subError string, err error)
+	UploadFrontalCameraPhotoForEval()
+	UploadFrontalCameraPhoto() (fileID string, err error)
 }
 
 type ImplSpectralData struct {
@@ -230,7 +231,7 @@ func (a *Impl) EvalNew() (res EvalNewResult, err error) {
 	}
 
 	// customer photo
-	a.hw.UploadEvalCustomerPhoto()
+	a.hw.UploadFrontalCameraPhotoForEval()
 
 	switch {
 	case netFail, failNoRoom, failHW:
@@ -544,7 +545,7 @@ func (a *Impl) Status() (res StatusResult, err error) {
 }
 
 // Performs a call to a named backend method defined in Goldex dashboard.
-func (a *Impl) Call(req CallRequest) (res CallResult, err error) {
+func (a *Impl) Backend(req BackendRequest) (res BackendResult, err error) {
 	if err = newValidator().Struct(req); err != nil {
 		return
 	}
@@ -552,7 +553,7 @@ func (a *Impl) Call(req CallRequest) (res CallResult, err error) {
 	if err != nil {
 		return
 	}
-	res = CallResult{
+	res = BackendResult{
 		HttpStatus: httpStatus,
 		Body:       response,
 	}
@@ -571,6 +572,18 @@ func (a *Impl) Hardware(req HardwareRequest) (res HardwareResult, err error) {
 	res = HardwareResult{
 		Error:  herr,
 		Result: kv,
+	}
+	return
+}
+
+// Requires the terminal to take a photo from frontal camera and upload it to Goldex backend. Photo could be accessed via Goldex API by returned file ID.
+func (a *Impl) CameraFrontal() (res CameraResult, err error) {
+	fid, err := a.hw.UploadFrontalCameraPhoto()
+	if err != nil {
+		return
+	}
+	res = CameraResult{
+		FileID: fid,
 	}
 	return
 }

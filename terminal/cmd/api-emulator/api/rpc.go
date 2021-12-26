@@ -1,8 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-
 	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
 )
 
@@ -56,20 +54,26 @@ func (r *RPC) StorageExtract(req *apiv1.StorageExtractRequest, res *apiv1.Storag
 	return
 }
 
-func (r *RPC) Status(_ json.RawMessage, res *apiv1.StatusResult) (err error) {
+func (r *RPC) Status(_ interface{}, res *apiv1.StatusResult) (err error) {
 	v, err := r.api.Status()
 	*res = v
 	return
 }
 
-func (r *RPC) Call(req *apiv1.CallRequest, res *apiv1.CallResult) (err error) {
-	v, err := r.api.Call(*req)
+func (r *RPC) Backend(req *apiv1.BackendRequest, res *apiv1.BackendResult) (err error) {
+	v, err := r.api.Backend(*req)
 	*res = v
 	return
 }
 
 func (r *RPC) Hardware(req *apiv1.HardwareRequest, res *apiv1.HardwareResult) (err error) {
 	v, err := r.api.Hardware(*req)
+	*res = v
+	return
+}
+
+func (r *RPC) CameraFrontal(_ interface{}, res *apiv1.CameraResult) (err error) {
+	v, err := r.api.CameraFrontal()
 	*res = v
 	return
 }
