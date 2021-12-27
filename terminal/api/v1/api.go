@@ -566,10 +566,27 @@ type StatusResult struct {
 	// example: true
 	InternetConnection bool `json:"internet_connection"`
 
+	// available features
+	//
+	Features StatusResultFeatures `json:"features"`
+
 	// available optional hardware
 	//
 	// example: {"my-pos":true,"my-printer":true}
 	OptionalHardware map[string]bool `json:"optional_hardware"`
+}
+
+// swagger:model
+type StatusResultFeatures struct {
+	// items storage is available
+	//
+	// example: true
+	Storage bool `json:"storage"`
+
+	// items storage is positional storage (has cells to store/extract items)
+	//
+	// example: true
+	PositionalStorage bool `json:"positional_storage"`
 }
 
 // swagger:model

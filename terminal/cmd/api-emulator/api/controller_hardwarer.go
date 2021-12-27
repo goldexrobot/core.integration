@@ -188,17 +188,6 @@ func (c *Controller) IntegrationUIMethod(method string, body map[string]interfac
 	return
 }
 
-func (c *Controller) UploadFrontalCameraPhotoForEval() {
-}
-
-func (c *Controller) UploadFrontalCameraPhoto() (fileID string, err error) {
-	return strings.ReplaceAll(uuid.NewString(), "-", ""), nil
-}
-
-func (c *Controller) InternetConnectivity() (ok bool) {
-	return c.accessNetwork()
-}
-
 func (c *Controller) OptionalHardwareHealthcheck() (health map[string]bool, err error) {
 	health = map[string]bool{
 		"my-pos-terminal": true,
@@ -214,4 +203,22 @@ func (c *Controller) OptionalHardwareRPC(module, method string, request map[stri
 	}
 	result = request
 	return
+}
+
+func (c *Controller) UploadFrontalCameraPhotoForEval() {}
+
+func (c *Controller) UploadFrontalCameraPhoto() (fileID string, err error) {
+	return strings.ReplaceAll(uuid.NewString(), "-", ""), nil
+}
+
+func (c *Controller) InternetConnectivity() (ok bool) {
+	return c.accessNetwork()
+}
+
+func (c *Controller) HasStorage() (ok bool) {
+	return true
+}
+
+func (c *Controller) HasPositionalStorage() (ok bool) {
+	return true
 }

@@ -71,11 +71,16 @@ type Hardwarer interface {
 	StorageReleaseCell(cell, domain, tx string) (netFail, forbidden bool, err error)
 
 	IntegrationUIMethod(method string, body map[string]interface{}) (httpStatus int, response map[string]interface{}, err error)
-	InternetConnectivity() (ok bool)
+
 	OptionalHardwareHealthcheck() (health map[string]bool, err error)
 	OptionalHardwareRPC(module, method string, request map[string]interface{}) (result map[string]interface{}, subError string, err error)
+
 	UploadFrontalCameraPhotoForEval()
 	UploadFrontalCameraPhoto() (fileID string, err error)
+
+	InternetConnectivity() (ok bool)
+	HasStorage() (ok bool)
+	HasPositionalStorage() (ok bool)
 }
 
 type ImplSpectralData struct {
@@ -540,6 +545,10 @@ func (a *Impl) Status() (res StatusResult, err error) {
 		Operational:        a.mod.Operational(),
 		InternetConnection: a.hw.InternetConnectivity(),
 		OptionalHardware:   sh,
+		Features: StatusResultFeatures{
+			Storage:           a.hw.HasStorage(),
+			PositionalStorage: a.hw.HasPositionalStorage(),
+		},
 	}
 	return
 }
