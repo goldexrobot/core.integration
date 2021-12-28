@@ -5,60 +5,12 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
-const hwBusinessMultDivider = 1000
-
-type Controller struct {
-	logger *logrus.Entry
-
-	evalCounter *uint64
-
-	hwBusinessMult *uint64
-
-	flagModuleBroken           *int32
-	flagHardwareFailure        *int32
-	flagNetworkFailure         *int32
-	flagStorageNoRoom          *int32
-	flagStorageAccessForbidden *int32
-	flagRejectEval             *int32
-	flagUnstableScale          *int32
-
-	evalDataMutex sync.Mutex
-	evalData      randomEvalData
-}
-
-type randomEvalData struct {
-	Spectrum   map[string]float64
-	Alloy      string
-	Purity     float64
-	Millesimal int
-	Carat      string
-	Weight     float64
-	Confidence float64
-	Risky      bool
-}
-
-func NewController(logger *logrus.Entry) *Controller {
-	hwbm := new(uint64)
-	*hwbm = 1 * hwBusinessMultDivider
-	return &Controller{
-		logger:                     logger,
-		hwBusinessMult:             hwbm,
-		evalCounter:                new(uint64),
-		flagModuleBroken:           new(int32),
-		flagHardwareFailure:        new(int32),
-		flagNetworkFailure:         new(int32),
-		flagStorageNoRoom:          new(int32),
-		flagStorageAccessForbidden: new(int32),
-		flagRejectEval:             new(int32),
-		flagUnstableScale:          new(int32),
-	}
+func (c *Controller) ResetAPI() bool {
+	return c.rpc.reset(c.apiImpl())
 }
 
 func (c *Controller) HealAPI() {

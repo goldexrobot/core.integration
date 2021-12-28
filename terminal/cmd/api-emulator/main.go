@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/fatih/color"
-	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/activity"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/api"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/console"
@@ -67,7 +66,7 @@ func main() {
 	// api server: websocket + jsonrpc
 	srv, err := api.NewServer(
 		int(*argPort),
-		apiv1.NewImpl(ctl, ctl, logger.WithField("api", "impl")),
+		ctl.RPC(),
 		logger.WithField("api", "srv"),
 	)
 	if err != nil {

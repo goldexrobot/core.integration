@@ -7,6 +7,8 @@ import (
 	"net/rpc"
 	"strings"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 var errMissingParams = errors.New("jsonrpc: request body missing params")
@@ -29,16 +31,19 @@ type serverCodec struct {
 	mutex   sync.Mutex // protects seq, pending
 	seq     uint64
 	pending map[uint64]*json.RawMessage
+
+	logger *logrus.Entry
 }
 
 // NewServerCodec returns a new rpc.ServerCodec using JSON-RPC on conn.
-func NewServerCodec(conn io.ReadWriteCloser, rpcPrefix string) rpc.ServerCodec {
+func NewServerCodec(conn io.ReadWriteCloser, rpcPrefix string, logger *logrus.Entry) rpc.ServerCodec {
 	return &serverCodec{
 		dec:       json.NewDecoder(conn),
 		enc:       json.NewEncoder(conn),
 		c:         conn,
 		pending:   make(map[uint64]*json.RawMessage),
 		rpcPrefix: rpcPrefix,
+		logger:    logger,
 	}
 }
 
@@ -80,6 +85,7 @@ func (c *serverCodec) ReadRequestHeader(r *rpc.Request) error {
 	// internal uint64 and save JSON on the side.
 	c.mutex.Lock()
 	c.seq++
+	c.logger.Infof("Begin #%v %q", c.seq, c.req.Method)
 	c.pending[c.seq] = c.req.Id
 	c.req.Id = nil
 	r.Seq = c.seq
@@ -109,6 +115,8 @@ func (c *serverCodec) WriteResponse(r *rpc.Response, x interface{}) error {
 	}
 	delete(c.pending, r.Seq)
 	c.mutex.Unlock()
+
+	c.logger.Infof("End #%v", r.Seq)
 
 	if b == nil {
 		// Invalid request so no id. Use JSON null.

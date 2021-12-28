@@ -8,7 +8,6 @@ import (
 	"net/rpc"
 	"sync"
 
-	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/api/jsonrpc"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
@@ -20,9 +19,9 @@ type Server struct {
 	rs     *rpc.Server
 }
 
-func NewServer(port int, a *apiv1.Impl, logger *logrus.Entry) (*Server, error) {
+func NewServer(port int, r *RPC, logger *logrus.Entry) (*Server, error) {
 	rs := rpc.NewServer()
-	if err := rs.Register(&RPC{a}); err != nil {
+	if err := rs.RegisterName("RPC", r); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +46,7 @@ func (s *Server) Serve(ctx context.Context, ready chan<- struct{}) {
 
 	// ws server
 	ws := &websocket.Server{
-		Handler:   wsConnectionHandler(s.rs),
+		Handler:   wsConnectionHandler(s.rs, s.logger.WithField("rpc", "")),
 		Handshake: func(c *websocket.Config, r *http.Request) error { return nil },
 	}
 
@@ -82,9 +81,9 @@ func (s *Server) Serve(ctx context.Context, ready chan<- struct{}) {
 	wg.Wait()
 }
 
-func wsConnectionHandler(rs *rpc.Server) func(*websocket.Conn) {
+func wsConnectionHandler(rs *rpc.Server, logger *logrus.Entry) func(*websocket.Conn) {
 	return func(c *websocket.Conn) {
-		codec := jsonrpc.NewServerCodec(c, "RPC")
+		codec := jsonrpc.NewServerCodec(c, "RPC", logger)
 		rs.ServeCodec(codec)
 	}
 }

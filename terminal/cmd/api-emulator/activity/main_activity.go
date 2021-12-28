@@ -12,6 +12,7 @@ type Main struct {
 }
 
 type Controller interface {
+	ResetAPI() bool
 	HealAPI()
 	SetHardwareBusinessMult(m float64)
 	ToggleFailOnHardwareAccess() bool
@@ -52,8 +53,9 @@ func (a *Main) Completer() ([]readline.PrefixCompleterInterface, []string) {
 				console.DPCItem("scale", "Emulate a mechanical vibration affecting weighing process"),
 			),
 		),
-		console.DPCItem("heal", "Set API fully healthy"),
 		console.DPCItem("delay", "Set hardware business delay multiplier [0.0,10.0]"),
+		console.DPCItem("heal", "Set API fully healthy"),
+		console.DPCItem("reset", "Reset API to initial state"),
 	}, nil
 }
 
@@ -127,6 +129,13 @@ func (a *Main) Command(ctx console.Context, args console.Args) bool {
 		} else {
 			a.Ctl.SetHardwareBusinessMult(v)
 			ctx.Infof("Hardware business delay multiplier set to %v", v)
+		}
+		return true
+	case "reset":
+		if a.Ctl.ResetAPI() {
+			ctx.Infof("API state has been reset")
+		} else {
+			ctx.Errorf("API has pending requests")
 		}
 		return true
 	}

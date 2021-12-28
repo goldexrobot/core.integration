@@ -224,7 +224,7 @@ func (a *Impl) EvalNew() (res EvalNewResult, err error) {
 	}
 	defer a.unlock()
 
-	if a.evalState != evalInitial {
+	if a.evalState != evalInitial && a.evalState != evalNewCreated && a.evalState != evalInletClosed {
 		err = fmt.Errorf("can't start a new evaluation right now")
 		return
 	}
