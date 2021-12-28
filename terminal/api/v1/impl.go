@@ -436,6 +436,9 @@ func (a *Impl) EvalStore(req EvalStoreRequest) (res EvalStoreResult, err error) 
 			err = a.brokenProxy(err)
 			return
 		}
+		if forbidden {
+			break
+		}
 		if netFail {
 			<-time.After(time.Second * 3)
 		}
@@ -485,7 +488,7 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 	}
 	defer a.unlock()
 
-	if a.evalState != evalInitial {
+	if a.evalState != evalInitial && a.evalState != evalNewCreated && a.evalState != evalInletClosed {
 		err = fmt.Errorf("invalid state: can't do it during evaluation")
 		return
 	}
@@ -502,6 +505,9 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 		if err != nil {
 			err = a.brokenProxy(err)
 			return
+		}
+		if forbidden {
+			break
 		}
 		if netFail {
 			<-time.After(time.Second * 3)
@@ -524,6 +530,8 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 		err = a.brokenProxy(err)
 		return
 	}
+
+	a.evalState = evalOutletOpened
 
 	res = StorageExtractResult{
 		Success: &StorageExtractResultSuccess{

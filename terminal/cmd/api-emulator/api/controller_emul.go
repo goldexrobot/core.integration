@@ -21,6 +21,7 @@ func (c *Controller) HealAPI() {
 	atomic.StoreInt32(c.flagStorageAccessForbidden, 0)
 	atomic.StoreInt32(c.flagRejectEval, 0)
 	atomic.StoreInt32(c.flagUnstableScale, 0)
+	c.ResetAPI()
 }
 
 func (c *Controller) SetHardwareBusinessMult(m float64) {
@@ -127,6 +128,8 @@ func (c *Controller) generateEvaluationData() {
 
 	var confidence = math.Floor((0.5+rand.Float64()*0.5)*1000) / 1000
 
+	var weight = math.Floor((1.0+(10*rand.Float64()))*1000) / 1000
+
 	c.evalData = randomEvalData{
 		Spectrum: map[string]float64{
 			alloy: purity,
@@ -135,7 +138,7 @@ func (c *Controller) generateEvaluationData() {
 		Purity:     purity,
 		Millesimal: millesimal,
 		Carat:      carat,
-		Weight:     rand.Float64(),
+		Weight:     weight,
 		Confidence: confidence,
 		Risky:      confidence < 0.88,
 	}

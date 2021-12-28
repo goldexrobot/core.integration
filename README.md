@@ -39,13 +39,31 @@ UI files must contain `index.html` and `ui-config.yaml`. Index is an entry point
 
 WebKit engine is used to serve HTML. There are some limitations:
 
+- The terminal have a touchscreen, so please keep in mind double-taps and mistaps. See details below;
 - Utilize all the required resources locally, i.e. JS, CSS, icons, etc., except videos;
-- Do not embed huge resources like video;
-- Do not display transparent video;
+- Do not embed huge resources like video into the UI package;
+- Do not use transparent video;
 - Database is unavailable, use local storage instead;
 - PDF rendering is not supported;
 - WebGL is not available;
 - Java is not available;
+
+#### Touchscreen
+
+The terminal have a touchscreen, so keep in mind touchscreen mistaps.
+
+Scenario:
+
+- a user taps a button;
+- the page changes;
+- a new button appears on the same place on the screen;
+- the user still holds his finger on the touchscreen;
+- suddenly another tap event is fired;
+- the new button now is also clicked and changes the page again;
+
+On page update keep buttons disabled for some time (about 200-300ms).
+
+#### UI package delivery
 
 Delivery of the UI is done by uploading packed (zip) UI files to Goldex dashboard.
 

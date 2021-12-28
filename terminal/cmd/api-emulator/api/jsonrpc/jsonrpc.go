@@ -85,7 +85,7 @@ func (c *serverCodec) ReadRequestHeader(r *rpc.Request) error {
 	// internal uint64 and save JSON on the side.
 	c.mutex.Lock()
 	c.seq++
-	c.logger.Infof("Begin #%v %q", c.seq, c.req.Method)
+	c.logger.Infof("ID[%v] => %q", c.seq, c.req.Method)
 	c.pending[c.seq] = c.req.Id
 	c.req.Id = nil
 	r.Seq = c.seq
@@ -116,8 +116,6 @@ func (c *serverCodec) WriteResponse(r *rpc.Response, x interface{}) error {
 	delete(c.pending, r.Seq)
 	c.mutex.Unlock()
 
-	c.logger.Infof("End #%v", r.Seq)
-
 	if b == nil {
 		// Invalid request so no id. Use JSON null.
 		b = &null
@@ -128,6 +126,10 @@ func (c *serverCodec) WriteResponse(r *rpc.Response, x interface{}) error {
 	} else {
 		resp.Error = r.Error
 	}
+
+	rb, _ := json.Marshal(resp)
+	c.logger.Warnf("ID[%v] <= %s", r.Seq, string(rb))
+
 	return c.enc.Encode(resp)
 }
 
