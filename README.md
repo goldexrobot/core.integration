@@ -67,6 +67,8 @@ On page update keep buttons disabled for some time (about 200-300ms).
 
 Delivery of the UI is done by uploading packed (zip) UI files to Goldex dashboard.
 
+Current zip size limit is 30MiB.
+
 #### UI config
 
 UI config defines externally allowed domains and should provide emergency contacts to show to a customer:
