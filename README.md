@@ -4,9 +4,13 @@ Integration with Goldex consists of two major parts: backend integration and ter
 
 [Documentation](https://goldexrobot.github.io/core.integration/).
 
+![Goldex environment](/docs/images/goldex_environment.png)
+
 ---
 
 ## Backend
+
+Goldex backend communicates with a Goldex vending terminal directly over secured communication channel.
 
 ### Backend callbacks
 
@@ -96,7 +100,8 @@ For developing API emulator is available [here](https://github.com/goldexrobot/c
 
 [Documentation](https://goldexrobot.github.io/core.integration/swagger/#/terminal-api-v1).
 
-### Flow example
+#### Flow
 
-TODO
+There is also a [sequence diagram](/docs/images/terminal_interaction_diagram.png)
 
+![Terminal API flow](/docs/images/terminal_api.png)
