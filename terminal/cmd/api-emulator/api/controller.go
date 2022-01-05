@@ -4,56 +4,58 @@ import (
 	"sync"
 
 	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
+	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/backend"
 	"github.com/sirupsen/logrus"
 )
 
 const hwBusinessMultDivider = 1000
 
+// Implements bot emulator console commands and interfaces required by terminal API
 type Controller struct {
-	logger *logrus.Entry
-	rpc    *RPC
-
-	evalCounter *uint64
+	logger  *logrus.Entry
+	rpc     *RPC
+	backend backend.Backender
 
 	hwBusinessMult *uint64
 
-	flagModuleBroken           *int32
-	flagHardwareFailure        *int32
-	flagNetworkFailure         *int32
-	flagStorageNoRoom          *int32
-	flagStorageAccessForbidden *int32
-	flagRejectEval             *int32
-	flagUnstableScale          *int32
+	flagModuleBroken                 *int32
+	flagHardwareFailure              *int32
+	flagNetworkFailure               *int32
+	flagStorageNoRoom                *int32
+	flagStorageAccessForbidden       *int32
+	flagRejectEval                   *int32
+	flagUnstableScale                *int32
+	flagEvaluationAlloySilver        *int32
+	flagEvaluationFinenessMillesimal *int32
 
 	evalDataMutex sync.Mutex
-	evalData      randomEvalData
+	evalData      evalData
 }
 
-type randomEvalData struct {
-	Spectrum   map[string]float64
-	Alloy      string
-	Purity     float64
-	Millesimal int
-	Carat      string
-	Weight     float64
-	Confidence float64
-	Risky      bool
+type evalData struct {
+	EvalID    uint64
+	Cell      string
+	Spectrum  map[string]float64
+	DryWeight float64
+	WetWeight float64
 }
 
-func NewController(logger *logrus.Entry) *Controller {
+func NewController(b backend.Backender, logger *logrus.Entry) *Controller {
 	hwbm := new(uint64)
 	*hwbm = 1 * hwBusinessMultDivider
 	c := &Controller{
-		logger:                     logger,
-		hwBusinessMult:             hwbm,
-		evalCounter:                new(uint64),
-		flagModuleBroken:           new(int32),
-		flagHardwareFailure:        new(int32),
-		flagNetworkFailure:         new(int32),
-		flagStorageNoRoom:          new(int32),
-		flagStorageAccessForbidden: new(int32),
-		flagRejectEval:             new(int32),
-		flagUnstableScale:          new(int32),
+		logger:                           logger,
+		backend:                          b,
+		hwBusinessMult:                   hwbm,
+		flagModuleBroken:                 new(int32),
+		flagHardwareFailure:              new(int32),
+		flagNetworkFailure:               new(int32),
+		flagStorageNoRoom:                new(int32),
+		flagStorageAccessForbidden:       new(int32),
+		flagRejectEval:                   new(int32),
+		flagUnstableScale:                new(int32),
+		flagEvaluationAlloySilver:        new(int32),
+		flagEvaluationFinenessMillesimal: new(int32),
 	}
 	c.rpc = &RPC{
 		api:     c.apiImpl(),
@@ -63,10 +65,12 @@ func NewController(logger *logrus.Entry) *Controller {
 	return c
 }
 
+// Returns RPC handler
 func (c *Controller) RPC() *RPC {
 	return c.rpc
 }
 
+// Creates a new API implementation instance (called on APi reset)
 func (c *Controller) apiImpl() *apiv1.Impl {
 	return apiv1.NewImpl(c, c, c.logger.WithField("api", "impl"))
 }

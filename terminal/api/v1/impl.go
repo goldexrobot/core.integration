@@ -501,7 +501,7 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 		forbidden bool
 	)
 	for i := 0; i < 3; i++ {
-		netFail, forbidden, err = a.hw.StorageReleaseCell(a.evalCell, string(req.Domain), tx)
+		netFail, forbidden, err = a.hw.StorageReleaseCell(req.Cell, string(req.Domain), tx)
 		if err != nil {
 			err = a.brokenProxy(err)
 			return

@@ -6,6 +6,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/golang-jwt/jwt/v4 v4.1.0
+	github.com/goldexrobot/core.proto v1.0.10
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	golang.org/x/tools v0.1.5

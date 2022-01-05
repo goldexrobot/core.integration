@@ -33,7 +33,7 @@ GRPC API is also available.
 
 ## Terminal
 
-Goldex terminal displays customer UI on the screen. UI is an HTML SPA (single page application) serving locally.
+Goldex terminal displays customer UI on the screen. UI is an HTML SPA (single page application) and served locally on the terminal.
 
 The terminal exposes an API that allows a developer to access the terminal hardware, interact with a business backend, etc.
 
@@ -75,7 +75,7 @@ Current zip size limit is 30MiB.
 
 #### UI config
 
-UI config defines externally allowed domains and should provide emergency contacts to show to a customer:
+UI config is `ui-config.yaml` inside UI zip package that defines externally allowed domains and should provide emergency contacts (hardware critical failures) to show to a customer:
 
 ```yaml
 # Multiline text to show to a customer (along with "Please contact support team:") in case of critical terminal failure
@@ -90,17 +90,23 @@ host_whitelist:
 
 ### Terminal API
 
-API is a [JSONRPC 2](https://www.jsonrpc.org/specification) API over [Websocket](https://en.wikipedia.org/wiki/WebSocket) connection (`http://localhost:80/ws`).
+API is served locally on the terminal. It exposes **methods** to control the terminal from UI and sends **events** to notify UI (for instance, optional hardware could send events).
 
-The API exposes **methods** to control the terminal from UI and sends **events** to notify UI.
+API is a [JSONRPC 2](https://www.jsonrpc.org/specification) API over [Websocket](https://en.wikipedia.org/wiki/WebSocket) connection (`http://localhost:80/ws`).
 
 [JSONRPC 2 batch](https://www.jsonrpc.org/specification#batch) requests are not supported. Moreover, hardware-related methods should be called sequently, error will be returned otherwise.
 
-For developing API emulator is available [here](https://github.com/goldexrobot/core.integration/releases).
-
 [Documentation](https://goldexrobot.github.io/core.integration/swagger/#/terminal-api-v1).
 
-#### Flow
+### Terminal API emulator
+
+Goldex provides terminal API emulator to simplify UI development. You'll find binaries [here](https://github.com/goldexrobot/core.integration/releases).
+
+The emulator serves terminal API on your local machine. The emulator does not emulate optional hardware, but can be connected to the Goldex sandbox environment, therefore can communicate with your testing backend. You'll need TLS certificate issued by Goldex to connect the emulator to the sandbox environment, so please contact Goldex team to get it.
+
+Emulator accepts commands to simulate connectivity, hardware and functional errors which could be occurred during real terminal usage. Please pay attention developing your UI.
+
+#### Terminal API flow
 
 There is also a [sequence diagram](/docs/images/terminal_interaction_diagram.png)
 

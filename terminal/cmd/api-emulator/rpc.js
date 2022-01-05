@@ -48,8 +48,8 @@ class RPC {
 				if (!!d['id'] && !d['method']) {
 					if (!!_this.pending[d.id]) {
 						console.debug("Websocket: response =>", e.data);
-						if (!!d['result']) _this.pending[d.id].resolve(d.result);
-						else if (!!d['error']) _this.pending[d.id].reject(d.error);
+						if (d.hasOwnProperty('result')) _this.pending[d.id].resolve(d.result);
+						else if (d.hasOwnProperty('error')) _this.pending[d.id].reject(d.error);
 						delete _this.pending[d.id];
 					}
 					return
@@ -68,12 +68,12 @@ class RPC {
 				return;
 			}
 			_this.id++;
-			_this.pending[this.id] = {
+			_this.pending[_this.id] = {
 				resolve: resolve,
 				reject: reject,
 			};
 			let req = JSON.stringify({ jsonrpc: "2.0", id: _this.id, method: method, params: params });
-			console.log("Websocket: request =>", req);
+			console.trace("Websocket: request =>", req);
 			_this.ws.send(req);
 		});
 	}

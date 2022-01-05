@@ -12,6 +12,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/activity"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/api"
+	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/backend"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/console"
 	"github.com/goldexrobot/core.integration/terminal/cmd/api-emulator/helpers"
 	"github.com/sirupsen/logrus"
@@ -19,8 +20,12 @@ import (
 
 func main() {
 	var (
-		argPort    = flag.Uint("port", 8080, "Port to serve /ws")
-		argConsole = flag.Bool("console", true, "Enable console interaction")
+		argPort           = flag.Uint("port", 8080, "Port to serve /ws")
+		argConsole        = flag.Bool("console", true, "Enable console interaction")
+		argBackendAddress = flag.String("backend", "", "Optional Goldex backend host/port")
+		argTLSCert        = flag.String("tls-cert", "./tls.crt", "Path to cert file for TLS")
+		argTLSKey         = flag.String("tls-key", "./tls.key", "Path to cert key for TLS")
+		argTLSCA          = flag.String("tls-ca", "./ca.crt", "Path to root CA certs file for TLS")
 	)
 	flag.Parse()
 
@@ -49,7 +54,7 @@ func main() {
 	})
 	logger.SetLevel(logrus.InfoLevel)
 
-	// console?
+	// has console?
 	if con != nil {
 		log.SetOutput(con.Stderr())
 		logger.SetOutput(io.Discard)
@@ -60,8 +65,21 @@ func main() {
 		logger.SetOutput(os.Stdout)
 	}
 
+	// backend client
+	var backender backend.Backender
+	if *argBackendAddress != "" {
+		cli := backend.NewClient(*argBackendAddress, *argTLSCert, *argTLSKey, *argTLSCA)
+		if err := cli.Connect(); err != nil {
+			fmt.Printf("Failed to connect to Goldex backend at %q: %v\n", *argBackendAddress, err)
+			return
+		}
+		backender = cli
+	} else {
+		backender = backend.NewMockClient()
+	}
+
 	// api controller
-	ctl := api.NewController(logger.WithField("api", "ctl"))
+	ctl := api.NewController(backender, logger.WithField("api", "ctl"))
 
 	// api server: websocket + jsonrpc
 	srv, err := api.NewServer(
@@ -91,7 +109,7 @@ func main() {
 	case <-srvReadiness:
 	}
 
-	// console?
+	// has console?
 	if con != nil {
 		// serve console
 		wg.Add(1)

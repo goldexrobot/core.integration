@@ -1,13 +1,28 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
 	"github.com/google/uuid"
 )
+
+var storageCellsOrder = []string{
+	"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9",
+	"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9",
+	"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9",
+	"D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9",
+	"E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9",
+	"F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+	"G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9",
+	"H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9",
+	"I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
+	"J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9",
+}
 
 ////// MODULE IMPL //////
 
@@ -47,9 +62,55 @@ func (c *Controller) NewEval() (evalID uint64, cell string, failNet, failNoRoom,
 		failNoRoom = true
 		return
 	}
-	cell = "A1"
-	evalID = atomic.AddUint64(c.evalCounter, 1)
-	c.generateEvaluationData()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// get occupied cells on backend side
+	occupiedCells, xerr := c.backend.OccupiedCells(ctx)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to get occupied cells")
+		failNet = true
+		return
+	}
+
+	// next non-occupied cell
+	for _, c := range storageCellsOrder {
+		occupied := false
+		for _, domainCells := range occupiedCells {
+			for _, cc := range domainCells {
+				if c == cc {
+					occupied = true
+					break
+				}
+			}
+			if occupied {
+				break
+			}
+		}
+		if !occupied {
+			cell = c
+			break
+		}
+	}
+	if cell == "" {
+		failNoRoom = true
+		return
+	}
+
+	// call backend
+	evalID, xerr = c.backend.NewEval(ctx)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to begin a new evaluation")
+		failNet = true
+		return
+	}
+
+	var alloy = "au"
+	if atomic.LoadInt32(c.flagEvaluationAlloySilver) != 0 {
+		alloy = "ag"
+	}
+	c.generateEvaluationData(evalID, cell, alloy, int(atomic.LoadInt32(c.flagEvaluationFinenessMillesimal)))
 	return
 }
 
@@ -65,15 +126,31 @@ func (c *Controller) SpectralEval() (eval apiv1.ImplSpectralData, netFail, rejec
 		rejectedEval = true
 		return
 	}
+
 	c.evalDataMutex.Lock()
+	defer c.evalDataMutex.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// call backend
+	fin, rejectedEval, xerr := c.backend.EvaluateSpectrum(ctx, c.evalData.EvalID, c.evalData.Spectrum)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to evaluate spectral data")
+		netFail = true
+		return
+	}
+	if rejectedEval {
+		return
+	}
+
 	eval = apiv1.ImplSpectralData{
-		Alloy:      c.evalData.Alloy,
-		Purity:     c.evalData.Purity,
-		Millesimal: c.evalData.Millesimal,
-		Carat:      c.evalData.Carat,
+		Alloy:      fin.Alloy,
+		Purity:     fin.Purity,
+		Millesimal: fin.Millesimal,
+		Carat:      fin.Carat,
 		Spectrum:   c.evalData.Spectrum,
 	}
-	c.evalDataMutex.Unlock()
 	return
 }
 
@@ -93,12 +170,28 @@ func (c *Controller) HydroEval() (eval apiv1.ImplHydroData, netFail, rejectedEva
 		rejectedEval = true
 		return
 	}
+
 	c.evalDataMutex.Lock()
-	eval = apiv1.ImplHydroData{
-		DryWeight: c.evalData.Weight,
-		WetWeight: c.evalData.Weight,
+	defer c.evalDataMutex.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// call backend
+	rejectedEval, xerr := c.backend.EvaluateHydro(ctx, c.evalData.EvalID, c.evalData.DryWeight, c.evalData.WetWeight)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to evaluate hydrostatic data")
+		netFail = true
+		return
 	}
-	c.evalDataMutex.Unlock()
+	if rejectedEval {
+		return
+	}
+
+	eval = apiv1.ImplHydroData{
+		DryWeight: c.evalData.DryWeight,
+		WetWeight: c.evalData.WetWeight,
+	}
 	return
 }
 
@@ -111,17 +204,33 @@ func (c *Controller) FinalizeEval() (fineness apiv1.ImplFinenessData, netFail, r
 		rejectedEval = true
 		return
 	}
+
 	c.evalDataMutex.Lock()
-	fineness = apiv1.ImplFinenessData{
-		Alloy:      c.evalData.Alloy,
-		Purity:     c.evalData.Purity,
-		Millesimal: c.evalData.Millesimal,
-		Carat:      c.evalData.Carat,
-		Weight:     c.evalData.Weight,
-		Confidence: c.evalData.Confidence,
-		Risky:      c.evalData.Risky,
+	defer c.evalDataMutex.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// call backend
+	fin, rejectedEval, xerr := c.backend.FinalizeEvaluation(ctx, c.evalData.EvalID)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to finalize evaluation data")
+		netFail = true
+		return
 	}
-	c.evalDataMutex.Unlock()
+	if rejectedEval {
+		return
+	}
+
+	fineness = apiv1.ImplFinenessData{
+		Alloy:      fin.Alloy,
+		Purity:     fin.Purity,
+		Millesimal: fin.Millesimal,
+		Carat:      fin.Carat,
+		Weight:     c.evalData.DryWeight,
+		Confidence: fin.Confidence,
+		Risky:      fin.Risky,
+	}
 	return
 }
 
@@ -143,7 +252,10 @@ func (c *Controller) StoreAfterHydroEval() (cell string, err error) {
 	if err = c.accessHardware(6); err != nil {
 		return
 	}
-	cell = "A1"
+
+	c.evalDataMutex.Lock()
+	defer c.evalDataMutex.Unlock()
+	cell = c.evalData.Cell
 	return
 }
 
@@ -163,6 +275,21 @@ func (c *Controller) StorageOccupyCell(cell, domain, tx string) (netFail, forbid
 		forbidden = true
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// call backend
+	forbidden, reason, xerr := c.backend.OccupyStorageCell(ctx, domain, cell, tx)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to occupy storage cell %v under domain %v", cell, domain)
+		netFail = true
+		return
+	}
+	if forbidden {
+		c.logger.Errorf("Forbidden to occupy storage cell %v under domain %v: %v", cell, domain, reason)
+		return
+	}
 	return
 }
 
@@ -175,6 +302,22 @@ func (c *Controller) StorageReleaseCell(cell, domain, tx string) (netFail, forbi
 		forbidden = true
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	// call backend
+	forbidden, reason, xerr := c.backend.ReleaseStorageCell(ctx, domain, cell, tx, false)
+	if xerr != nil {
+		c.logger.WithError(xerr).Errorf("Failed calling backend to release storage cell %v under domain %v", cell, domain)
+		netFail = true
+		return
+	}
+	if forbidden {
+		c.logger.Errorf("Forbidden to release storage cell %v under domain %v: %v", cell, domain, reason)
+		return
+	}
+
 	return
 }
 
@@ -183,8 +326,16 @@ func (c *Controller) IntegrationUIMethod(method string, body map[string]interfac
 		err = errors.New("network failure")
 		return
 	}
-	httpStatus = 200
-	response = body
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	// call backend
+	response, httpStatus, err = c.backend.IntegrationUIMethod(ctx, method, body)
+	if err != nil {
+		c.logger.WithError(err).Errorf("Failed calling backend UI method %q", method)
+		return
+	}
 	return
 }
 
