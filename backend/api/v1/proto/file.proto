@@ -10,14 +10,14 @@ import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-va
 
 service File {
 	// Get a file by ID
-	rpc File(FileModel) returns (stream google.api.HttpBody) {
+	rpc File(FileRequest) returns (stream google.api.HttpBody) {
 		option (google.api.http) = {
 			get: "/v1/file/{id}"
 		};
 	}
 }
 
-message FileModel {
+message FileRequest {
+	// File ID
 	string id = 1 [(validate.rules).string = { pattern: "^[a-zA-Z0-9]{32}$" }];
-	reserved 2 to 5;
 }

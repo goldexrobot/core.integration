@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StorageClient interface {
 	// Get occupied storage cells for the bot specified by ID
-	State(ctx context.Context, in *StateModel, opts ...grpc.CallOption) (*StateResult, error)
+	State(ctx context.Context, in *StateRequest, opts ...grpc.CallOption) (*StateResponse, error)
 }
 
 type storageClient struct {
@@ -30,8 +30,8 @@ func NewStorageClient(cc grpc.ClientConnInterface) StorageClient {
 	return &storageClient{cc}
 }
 
-func (c *storageClient) State(ctx context.Context, in *StateModel, opts ...grpc.CallOption) (*StateResult, error) {
-	out := new(StateResult)
+func (c *storageClient) State(ctx context.Context, in *StateRequest, opts ...grpc.CallOption) (*StateResponse, error) {
+	out := new(StateResponse)
 	err := c.cc.Invoke(ctx, "/core.backend.integration.api.v1.storage.Storage/State", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (c *storageClient) State(ctx context.Context, in *StateModel, opts ...grpc.
 // for forward compatibility
 type StorageServer interface {
 	// Get occupied storage cells for the bot specified by ID
-	State(context.Context, *StateModel) (*StateResult, error)
+	State(context.Context, *StateRequest) (*StateResponse, error)
 	mustEmbedUnimplementedStorageServer()
 }
 
@@ -52,7 +52,7 @@ type StorageServer interface {
 type UnimplementedStorageServer struct {
 }
 
-func (UnimplementedStorageServer) State(context.Context, *StateModel) (*StateResult, error) {
+func (UnimplementedStorageServer) State(context.Context, *StateRequest) (*StateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method State not implemented")
 }
 func (UnimplementedStorageServer) mustEmbedUnimplementedStorageServer() {}
@@ -69,7 +69,7 @@ func RegisterStorageServer(s grpc.ServiceRegistrar, srv StorageServer) {
 }
 
 func _Storage_State_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StateModel)
+	in := new(StateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func _Storage_State_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/core.backend.integration.api.v1.storage.Storage/State",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServer).State(ctx, req.(*StateModel))
+		return srv.(StorageServer).State(ctx, req.(*StateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

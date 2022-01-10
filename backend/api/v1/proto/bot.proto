@@ -9,15 +9,44 @@ import "google/protobuf/empty.proto";
 import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
 
 service Bot {
+	// List bots related to the project
+	rpc List(google.protobuf.Empty) returns (ListResponse) {
+		option (google.api.http) = {
+			get: "/v1/bot"
+		};
+	}
 	// Send bot command
-	rpc SendCommand(SendCommandModel) returns (google.protobuf.Empty) {
+	rpc SendCommand(SendCommandRequest) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			post: "/v1/bot/{bot_id}/command"
+			body: "command",
 		};
 	}
 }
 
-message SendCommandModel {
+message ListResponse {
+	// ID to bot description
+	map<uint64,BotInfo> bots = 1;
+	reserved 2 to 5;
+}
+
+message BotInfo {
+	// Serial number
+	string serial = 1;
+	// Active UI packages: channel to revision
+	map<string,string> ui_packages = 2;
+	reserved 3 to 10;
+}
+
+message SendCommandRequest {
+	// Bot ID
 	uint64 bot_id = 1;
-	string command = 2 [(validate.rules).string = { in: ["mode_out_of_service", "mode_operational", "stop_alarm", "power_off"] }];
+	// Command to perform
+	Command command = 2 [(validate.rules).message.required = true];
+}
+
+message Command {
+	// Command name
+	string command = 1 [(validate.rules).string = { in: ["mode_out_of_service", "mode_operational", "stop_alarm", "power_off"] }];
+	reserved 2 to 5;
 }

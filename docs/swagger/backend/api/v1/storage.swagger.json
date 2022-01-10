@@ -24,7 +24,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/storageStateResult"
+              "$ref": "#/definitions/storageStateResponse"
             }
           },
           "default": {
@@ -87,11 +87,11 @@
         },
         "transaction": {
           "type": "string",
-          "title": "Occupation transaction"
+          "title": "Unique cell operation"
         }
       }
     },
-    "storageStateResult": {
+    "storageStateResponse": {
       "type": "object",
       "properties": {
         "occupiedCells": {

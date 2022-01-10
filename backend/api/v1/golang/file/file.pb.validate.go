@@ -35,30 +35,30 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on FileModel with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on FileRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *FileModel) Validate() error {
+func (m *FileRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on FileModel with the rules defined in
+// ValidateAll checks the field values on FileRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in FileModelMultiError, or nil
-// if none found.
-func (m *FileModel) ValidateAll() error {
+// result is a list of violation errors wrapped in FileRequestMultiError, or
+// nil if none found.
+func (m *FileRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *FileModel) validate(all bool) error {
+func (m *FileRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if !_FileModel_Id_Pattern.MatchString(m.GetId()) {
-		err := FileModelValidationError{
+	if !_FileRequest_Id_Pattern.MatchString(m.GetId()) {
+		err := FileRequestValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-zA-Z0-9]{32}$\"",
 		}
@@ -69,17 +69,17 @@ func (m *FileModel) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return FileModelMultiError(errors)
+		return FileRequestMultiError(errors)
 	}
 	return nil
 }
 
-// FileModelMultiError is an error wrapping multiple validation errors returned
-// by FileModel.ValidateAll() if the designated constraints aren't met.
-type FileModelMultiError []error
+// FileRequestMultiError is an error wrapping multiple validation errors
+// returned by FileRequest.ValidateAll() if the designated constraints aren't met.
+type FileRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m FileModelMultiError) Error() string {
+func (m FileRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -88,11 +88,11 @@ func (m FileModelMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m FileModelMultiError) AllErrors() []error { return m }
+func (m FileRequestMultiError) AllErrors() []error { return m }
 
-// FileModelValidationError is the validation error returned by
-// FileModel.Validate if the designated constraints aren't met.
-type FileModelValidationError struct {
+// FileRequestValidationError is the validation error returned by
+// FileRequest.Validate if the designated constraints aren't met.
+type FileRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -100,22 +100,22 @@ type FileModelValidationError struct {
 }
 
 // Field function returns field value.
-func (e FileModelValidationError) Field() string { return e.field }
+func (e FileRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e FileModelValidationError) Reason() string { return e.reason }
+func (e FileRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e FileModelValidationError) Cause() error { return e.cause }
+func (e FileRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e FileModelValidationError) Key() bool { return e.key }
+func (e FileRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e FileModelValidationError) ErrorName() string { return "FileModelValidationError" }
+func (e FileRequestValidationError) ErrorName() string { return "FileRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e FileModelValidationError) Error() string {
+func (e FileRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -127,14 +127,14 @@ func (e FileModelValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sFileModel.%s: %s%s",
+		"invalid %sFileRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = FileModelValidationError{}
+var _ error = FileRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -142,6 +142,6 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = FileModelValidationError{}
+} = FileRequestValidationError{}
 
-var _FileModel_Id_Pattern = regexp.MustCompile("^[a-zA-Z0-9]{32}$")
+var _FileRequest_Id_Pattern = regexp.MustCompile("^[a-zA-Z0-9]{32}$")

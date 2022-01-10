@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_File_File_0(ctx context.Context, marshaler runtime.Marshaler, client FileClient, req *http.Request, pathParams map[string]string) (File_FileClient, runtime.ServerMetadata, error) {
-	var protoReq FileModel
+	var protoReq FileRequest
 	var metadata runtime.ServerMetadata
 
 	var (

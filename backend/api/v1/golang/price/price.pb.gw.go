@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_Price_Price_0(ctx context.Context, marshaler runtime.Marshaler, client PriceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PriceModel
+	var protoReq PriceRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -58,7 +58,7 @@ func request_Price_Price_0(ctx context.Context, marshaler runtime.Marshaler, cli
 }
 
 func local_request_Price_Price_0(ctx context.Context, marshaler runtime.Marshaler, server PriceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PriceModel
+	var protoReq PriceRequest
 	var metadata runtime.ServerMetadata
 
 	var (

@@ -9,30 +9,32 @@ import "google/api/annotations.proto";
 
 service Storage {
 	// Get occupied storage cells for the bot specified by ID
-	rpc State(StateModel) returns (StateResult) {
+	rpc State(StateRequest) returns (StateResponse) {
 		option (google.api.http) = {
 			get: "/v1/storage/{bot_id}/state"
 		};
 	}
 }
 
-message StateModel {
+message StateRequest {
 	// Bot ID
 	uint64 bot_id = 1;
 }
 
-message OccupiedCell {
-	// Domain in which the cell is occupied
-	string domain = 1;
-	// Occupation transaction
-	string transaction = 2;
-}
-
-message StateResult {
+message StateResponse {
 	// Occupied cells
 	map<string,OccupiedCell> occupied_cells = 1;
 	// Total available cells or -1 if unknown
 	int32 total = 2;
 	// Available (free) cells or -1 if unknown
 	int32 available = 3;
+	reserved 4 to 10;
+}
+
+message OccupiedCell {
+	// Domain in which the cell is occupied
+	string domain = 1;
+	// Unique cell operation
+	string transaction = 2;
+	reserved 3 to 5;
 }

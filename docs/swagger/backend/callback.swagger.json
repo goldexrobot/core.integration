@@ -1,7 +1,6 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Goldex can send a number of `POST` callbacks (`application/json`) to your backend.\nSome callbacks are `synchronous`, which means if the callback is defined it `must` respond with HTTP status `200`.\nOther callbacks are `asynchronous`: Goldex queues this callback and periodically tries to deliver it, until get HTTP status `200`.\n\nCallbacks (see Goldex dashboard for detailed list):\n1. Item evaluation just started (sync);\n2. Item evaluation finished successfully (async);\n3. Storage cell occupation attempt (sync);\n4. Storage cell release attempt (sync);\n5. Custom named methods accessable for terminal UI (sync).\n\nGoldex sends HTTP headers with each callback:\n1. `X-CBOT-PROJECT-ID` contains Goldex-world project ID;\n2. `X-CBOT-BOT-ID` contains Goldex-world bot ID;\n\nMoreover, Goldex signs the callbacks, so you are able to verify it with a per-project public key (see Goldex dashboard).\n\nActual callback payloads are described below in this document.",
     "title": "Goldex backend callbacks."
   },
   "paths": {},
@@ -189,10 +188,10 @@
           "example": "\"A1\", \"J9\""
         },
         "domain": {
-          "description": "Origin of the event in terms of UI flow. Here \"dashboard\" is on-bot system dashboard, \"other\" is some custom origin.",
+          "description": "Origin of the event in terms of UI flow. Here \"dashboard\" is on-bot system dashboard, \"other\" is some custom origin, \"collection\" is storage loading/unloading dashboard.",
           "type": "string",
           "x-go-name": "Domain",
-          "example": "\"other\", \"dashboard\", \"buyout\", \"shop\", \"pawnshop\""
+          "example": "\"other\", \"dashboard\", \"buyout\", \"shop\", \"pawnshop\", \"collection\""
         },
         "project_id": {
           "description": "Project ID",
@@ -200,6 +199,12 @@
           "format": "uint64",
           "x-go-name": "ProjectID",
           "example": 1
+        },
+        "transaction": {
+          "description": "Transaction ID as unique cell changing operation",
+          "type": "string",
+          "x-go-name": "Transaction",
+          "example": "\"240702e1e8be42d39137c1d802dd6941\""
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"

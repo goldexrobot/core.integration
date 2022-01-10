@@ -35,30 +35,30 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on PriceModel with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on PriceRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *PriceModel) Validate() error {
+func (m *PriceRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PriceModel with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PriceModelMultiError, or
+// ValidateAll checks the field values on PriceRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PriceRequestMultiError, or
 // nil if none found.
-func (m *PriceModel) ValidateAll() error {
+func (m *PriceRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PriceModel) validate(all bool) error {
+func (m *PriceRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if _, ok := _PriceModel_Metal_InLookup[m.GetMetal()]; !ok {
-		err := PriceModelValidationError{
+	if _, ok := _PriceRequest_Metal_InLookup[m.GetMetal()]; !ok {
+		err := PriceRequestValidationError{
 			field:  "Metal",
 			reason: "value must be in list [au ag]",
 		}
@@ -69,17 +69,17 @@ func (m *PriceModel) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return PriceModelMultiError(errors)
+		return PriceRequestMultiError(errors)
 	}
 	return nil
 }
 
-// PriceModelMultiError is an error wrapping multiple validation errors
-// returned by PriceModel.ValidateAll() if the designated constraints aren't met.
-type PriceModelMultiError []error
+// PriceRequestMultiError is an error wrapping multiple validation errors
+// returned by PriceRequest.ValidateAll() if the designated constraints aren't met.
+type PriceRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PriceModelMultiError) Error() string {
+func (m PriceRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -88,11 +88,11 @@ func (m PriceModelMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PriceModelMultiError) AllErrors() []error { return m }
+func (m PriceRequestMultiError) AllErrors() []error { return m }
 
-// PriceModelValidationError is the validation error returned by
-// PriceModel.Validate if the designated constraints aren't met.
-type PriceModelValidationError struct {
+// PriceRequestValidationError is the validation error returned by
+// PriceRequest.Validate if the designated constraints aren't met.
+type PriceRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -100,22 +100,22 @@ type PriceModelValidationError struct {
 }
 
 // Field function returns field value.
-func (e PriceModelValidationError) Field() string { return e.field }
+func (e PriceRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PriceModelValidationError) Reason() string { return e.reason }
+func (e PriceRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PriceModelValidationError) Cause() error { return e.cause }
+func (e PriceRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PriceModelValidationError) Key() bool { return e.key }
+func (e PriceRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PriceModelValidationError) ErrorName() string { return "PriceModelValidationError" }
+func (e PriceRequestValidationError) ErrorName() string { return "PriceRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e PriceModelValidationError) Error() string {
+func (e PriceRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -127,14 +127,14 @@ func (e PriceModelValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPriceModel.%s: %s%s",
+		"invalid %sPriceRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PriceModelValidationError{}
+var _ error = PriceRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -142,29 +142,29 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PriceModelValidationError{}
+} = PriceRequestValidationError{}
 
-var _PriceModel_Metal_InLookup = map[string]struct{}{
+var _PriceRequest_Metal_InLookup = map[string]struct{}{
 	"au": {},
 	"ag": {},
 }
 
-// Validate checks the field values on PriceResult with the rules defined in
+// Validate checks the field values on PriceResponse with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *PriceResult) Validate() error {
+func (m *PriceResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PriceResult with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PriceResultMultiError, or
+// ValidateAll checks the field values on PriceResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PriceResponseMultiError, or
 // nil if none found.
-func (m *PriceResult) ValidateAll() error {
+func (m *PriceResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PriceResult) validate(all bool) error {
+func (m *PriceResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -174,17 +174,18 @@ func (m *PriceResult) validate(all bool) error {
 	// no validation rules for Price
 
 	if len(errors) > 0 {
-		return PriceResultMultiError(errors)
+		return PriceResponseMultiError(errors)
 	}
 	return nil
 }
 
-// PriceResultMultiError is an error wrapping multiple validation errors
-// returned by PriceResult.ValidateAll() if the designated constraints aren't met.
-type PriceResultMultiError []error
+// PriceResponseMultiError is an error wrapping multiple validation errors
+// returned by PriceResponse.ValidateAll() if the designated constraints
+// aren't met.
+type PriceResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PriceResultMultiError) Error() string {
+func (m PriceResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -193,11 +194,11 @@ func (m PriceResultMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PriceResultMultiError) AllErrors() []error { return m }
+func (m PriceResponseMultiError) AllErrors() []error { return m }
 
-// PriceResultValidationError is the validation error returned by
-// PriceResult.Validate if the designated constraints aren't met.
-type PriceResultValidationError struct {
+// PriceResponseValidationError is the validation error returned by
+// PriceResponse.Validate if the designated constraints aren't met.
+type PriceResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -205,22 +206,22 @@ type PriceResultValidationError struct {
 }
 
 // Field function returns field value.
-func (e PriceResultValidationError) Field() string { return e.field }
+func (e PriceResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PriceResultValidationError) Reason() string { return e.reason }
+func (e PriceResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PriceResultValidationError) Cause() error { return e.cause }
+func (e PriceResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PriceResultValidationError) Key() bool { return e.key }
+func (e PriceResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PriceResultValidationError) ErrorName() string { return "PriceResultValidationError" }
+func (e PriceResponseValidationError) ErrorName() string { return "PriceResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e PriceResultValidationError) Error() string {
+func (e PriceResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -232,14 +233,14 @@ func (e PriceResultValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPriceResult.%s: %s%s",
+		"invalid %sPriceResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PriceResultValidationError{}
+var _ error = PriceResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -247,4 +248,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PriceResultValidationError{}
+} = PriceResponseValidationError{}

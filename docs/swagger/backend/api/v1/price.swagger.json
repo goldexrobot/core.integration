@@ -24,7 +24,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pricePriceResult"
+              "$ref": "#/definitions/pricePriceResponse"
             }
           },
           "default": {
@@ -37,6 +37,7 @@
         "parameters": [
           {
             "name": "metal",
+            "description": "Metal: \"au\" or \"ag\"",
             "in": "path",
             "required": true,
             "type": "string"
@@ -49,7 +50,7 @@
     }
   },
   "definitions": {
-    "pricePriceResult": {
+    "pricePriceResponse": {
       "type": "object",
       "properties": {
         "price": {

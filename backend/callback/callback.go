@@ -1,24 +1,5 @@
 // Goldex backend callbacks.
 //
-// Goldex can send a number of `POST` callbacks (`application/json`) to your backend.
-// Some callbacks are `synchronous`, which means if the callback is defined it `must` respond with HTTP status `200`.
-// Other callbacks are `asynchronous`: Goldex queues this callback and periodically tries to deliver it, until get HTTP status `200`.
-//
-// Callbacks (see Goldex dashboard for detailed list):
-// 1. Item evaluation just started (sync);
-// 2. Item evaluation finished successfully (async);
-// 3. Storage cell occupation attempt (sync);
-// 4. Storage cell release attempt (sync);
-// 5. Custom named methods accessable for terminal UI (sync).
-//
-// Goldex sends HTTP headers with each callback:
-// 1. `X-CBOT-PROJECT-ID` contains Goldex-world project ID;
-// 2. `X-CBOT-BOT-ID` contains Goldex-world bot ID;
-//
-// Moreover, Goldex signs the callbacks, so you are able to verify it with a per-project public key (see Goldex dashboard).
-//
-// Actual callback payloads are described below in this document.
-//
 // swagger:meta
 package callback
 
@@ -137,8 +118,12 @@ type StorageCellEvent struct {
 	//
 	// example: "A1", "J9"
 	Cell string `json:"cell"`
-	// Origin of the event in terms of UI flow. Here "dashboard" is on-bot system dashboard, "other" is some custom origin.
+	// Origin of the event in terms of UI flow. Here "dashboard" is on-bot system dashboard, "other" is some custom origin, "collection" is storage loading/unloading dashboard.
 	//
-	// example: "other", "dashboard", "buyout", "shop", "pawnshop"
+	// example: "other", "dashboard", "buyout", "shop", "pawnshop", "collection"
 	Domain string `json:"domain"`
+	// Transaction ID as unique cell changing operation
+	//
+	// example: "240702e1e8be42d39137c1d802dd6941"
+	Transaction string `json:"transaction"`
 }

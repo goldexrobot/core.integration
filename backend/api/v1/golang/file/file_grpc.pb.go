@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileClient interface {
 	// Get a file by ID
-	File(ctx context.Context, in *FileModel, opts ...grpc.CallOption) (File_FileClient, error)
+	File(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (File_FileClient, error)
 }
 
 type fileClient struct {
@@ -31,7 +31,7 @@ func NewFileClient(cc grpc.ClientConnInterface) FileClient {
 	return &fileClient{cc}
 }
 
-func (c *fileClient) File(ctx context.Context, in *FileModel, opts ...grpc.CallOption) (File_FileClient, error) {
+func (c *fileClient) File(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (File_FileClient, error) {
 	stream, err := c.cc.NewStream(ctx, &File_ServiceDesc.Streams[0], "/core.backend.integration.api.v1.file.File/File", opts...)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (x *fileFileClient) Recv() (*httpbody.HttpBody, error) {
 // for forward compatibility
 type FileServer interface {
 	// Get a file by ID
-	File(*FileModel, File_FileServer) error
+	File(*FileRequest, File_FileServer) error
 	mustEmbedUnimplementedFileServer()
 }
 
@@ -76,7 +76,7 @@ type FileServer interface {
 type UnimplementedFileServer struct {
 }
 
-func (UnimplementedFileServer) File(*FileModel, File_FileServer) error {
+func (UnimplementedFileServer) File(*FileRequest, File_FileServer) error {
 	return status.Errorf(codes.Unimplemented, "method File not implemented")
 }
 func (UnimplementedFileServer) mustEmbedUnimplementedFileServer() {}
@@ -93,7 +93,7 @@ func RegisterFileServer(s grpc.ServiceRegistrar, srv FileServer) {
 }
 
 func _File_File_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(FileModel)
+	m := new(FileRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

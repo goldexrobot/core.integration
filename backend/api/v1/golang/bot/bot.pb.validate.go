@@ -35,54 +35,86 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on SendCommandModel with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *SendCommandModel) Validate() error {
+// Validate checks the field values on ListResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ListResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on SendCommandModel with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// SendCommandModelMultiError, or nil if none found.
-func (m *SendCommandModel) ValidateAll() error {
+// ValidateAll checks the field values on ListResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListResponseMultiError, or
+// nil if none found.
+func (m *ListResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *SendCommandModel) validate(all bool) error {
+func (m *ListResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for BotId
+	{
+		sorted_keys := make([]uint64, len(m.GetBots()))
+		i := 0
+		for key := range m.GetBots() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetBots()[key]
+			_ = val
 
-	if _, ok := _SendCommandModel_Command_InLookup[m.GetCommand()]; !ok {
-		err := SendCommandModelValidationError{
-			field:  "Command",
-			reason: "value must be in list [mode_out_of_service mode_operational stop_alarm power_off]",
+			// no validation rules for Bots[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, ListResponseValidationError{
+							field:  fmt.Sprintf("Bots[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, ListResponseValidationError{
+							field:  fmt.Sprintf("Bots[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return ListResponseValidationError{
+						field:  fmt.Sprintf("Bots[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
-		return SendCommandModelMultiError(errors)
+		return ListResponseMultiError(errors)
 	}
 	return nil
 }
 
-// SendCommandModelMultiError is an error wrapping multiple validation errors
-// returned by SendCommandModel.ValidateAll() if the designated constraints
-// aren't met.
-type SendCommandModelMultiError []error
+// ListResponseMultiError is an error wrapping multiple validation errors
+// returned by ListResponse.ValidateAll() if the designated constraints aren't met.
+type ListResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m SendCommandModelMultiError) Error() string {
+func (m ListResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -91,11 +123,11 @@ func (m SendCommandModelMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m SendCommandModelMultiError) AllErrors() []error { return m }
+func (m ListResponseMultiError) AllErrors() []error { return m }
 
-// SendCommandModelValidationError is the validation error returned by
-// SendCommandModel.Validate if the designated constraints aren't met.
-type SendCommandModelValidationError struct {
+// ListResponseValidationError is the validation error returned by
+// ListResponse.Validate if the designated constraints aren't met.
+type ListResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -103,22 +135,22 @@ type SendCommandModelValidationError struct {
 }
 
 // Field function returns field value.
-func (e SendCommandModelValidationError) Field() string { return e.field }
+func (e ListResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e SendCommandModelValidationError) Reason() string { return e.reason }
+func (e ListResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e SendCommandModelValidationError) Cause() error { return e.cause }
+func (e ListResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e SendCommandModelValidationError) Key() bool { return e.key }
+func (e ListResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e SendCommandModelValidationError) ErrorName() string { return "SendCommandModelValidationError" }
+func (e ListResponseValidationError) ErrorName() string { return "ListResponseValidationError" }
 
 // Error satisfies the builtin error interface
-func (e SendCommandModelValidationError) Error() string {
+func (e ListResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -130,14 +162,14 @@ func (e SendCommandModelValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sSendCommandModel.%s: %s%s",
+		"invalid %sListResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = SendCommandModelValidationError{}
+var _ error = ListResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -145,9 +177,361 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = SendCommandModelValidationError{}
+} = ListResponseValidationError{}
 
-var _SendCommandModel_Command_InLookup = map[string]struct{}{
+// Validate checks the field values on BotInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *BotInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BotInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in BotInfoMultiError, or nil if none found.
+func (m *BotInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BotInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Serial
+
+	// no validation rules for UiPackages
+
+	if len(errors) > 0 {
+		return BotInfoMultiError(errors)
+	}
+	return nil
+}
+
+// BotInfoMultiError is an error wrapping multiple validation errors returned
+// by BotInfo.ValidateAll() if the designated constraints aren't met.
+type BotInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BotInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BotInfoMultiError) AllErrors() []error { return m }
+
+// BotInfoValidationError is the validation error returned by BotInfo.Validate
+// if the designated constraints aren't met.
+type BotInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BotInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BotInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BotInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BotInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BotInfoValidationError) ErrorName() string { return "BotInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BotInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBotInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BotInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BotInfoValidationError{}
+
+// Validate checks the field values on SendCommandRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SendCommandRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SendCommandRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SendCommandRequestMultiError, or nil if none found.
+func (m *SendCommandRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SendCommandRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for BotId
+
+	if m.GetCommand() == nil {
+		err := SendCommandRequestValidationError{
+			field:  "Command",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetCommand()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SendCommandRequestValidationError{
+					field:  "Command",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SendCommandRequestValidationError{
+					field:  "Command",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCommand()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SendCommandRequestValidationError{
+				field:  "Command",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SendCommandRequestMultiError(errors)
+	}
+	return nil
+}
+
+// SendCommandRequestMultiError is an error wrapping multiple validation errors
+// returned by SendCommandRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SendCommandRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SendCommandRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SendCommandRequestMultiError) AllErrors() []error { return m }
+
+// SendCommandRequestValidationError is the validation error returned by
+// SendCommandRequest.Validate if the designated constraints aren't met.
+type SendCommandRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SendCommandRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SendCommandRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SendCommandRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SendCommandRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SendCommandRequestValidationError) ErrorName() string {
+	return "SendCommandRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SendCommandRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSendCommandRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SendCommandRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SendCommandRequestValidationError{}
+
+// Validate checks the field values on Command with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Command) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Command with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in CommandMultiError, or nil if none found.
+func (m *Command) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Command) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := _Command_Command_InLookup[m.GetCommand()]; !ok {
+		err := CommandValidationError{
+			field:  "Command",
+			reason: "value must be in list [mode_out_of_service mode_operational stop_alarm power_off]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return CommandMultiError(errors)
+	}
+	return nil
+}
+
+// CommandMultiError is an error wrapping multiple validation errors returned
+// by Command.ValidateAll() if the designated constraints aren't met.
+type CommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CommandMultiError) AllErrors() []error { return m }
+
+// CommandValidationError is the validation error returned by Command.Validate
+// if the designated constraints aren't met.
+type CommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CommandValidationError) ErrorName() string { return "CommandValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CommandValidationError{}
+
+var _Command_Command_InLookup = map[string]struct{}{
 	"mode_out_of_service": {},
 	"mode_operational":    {},
 	"stop_alarm":          {},

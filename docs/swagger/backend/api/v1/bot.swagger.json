@@ -16,6 +16,29 @@
     "application/json"
   ],
   "paths": {
+    "/v1/bot": {
+      "get": {
+        "summary": "List bots related to the project",
+        "operationId": "Bot_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/botListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Bot"
+        ]
+      }
+    },
     "/v1/bot/{botId}/command": {
       "post": {
         "summary": "Send bot command",
@@ -37,16 +60,20 @@
         "parameters": [
           {
             "name": "botId",
+            "description": "Bot ID",
             "in": "path",
             "required": true,
             "type": "string",
             "format": "uint64"
           },
           {
-            "name": "command",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "description": "Command to perform",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/botCommand"
+            }
           }
         ],
         "tags": [
@@ -56,6 +83,43 @@
     }
   },
   "definitions": {
+    "botBotInfo": {
+      "type": "object",
+      "properties": {
+        "serial": {
+          "type": "string",
+          "title": "Serial number"
+        },
+        "uiPackages": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Active UI packages: channel to revision"
+        }
+      }
+    },
+    "botCommand": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "title": "Command name"
+        }
+      }
+    },
+    "botListResponse": {
+      "type": "object",
+      "properties": {
+        "bots": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/botBotInfo"
+          },
+          "title": "ID to bot description"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

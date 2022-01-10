@@ -46,6 +46,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "File ID",
             "in": "path",
             "required": true,
             "type": "string"

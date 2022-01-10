@@ -35,22 +35,22 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on StateModel with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on StateRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *StateModel) Validate() error {
+func (m *StateRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on StateModel with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in StateModelMultiError, or
+// ValidateAll checks the field values on StateRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in StateRequestMultiError, or
 // nil if none found.
-func (m *StateModel) ValidateAll() error {
+func (m *StateRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *StateModel) validate(all bool) error {
+func (m *StateRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -60,17 +60,17 @@ func (m *StateModel) validate(all bool) error {
 	// no validation rules for BotId
 
 	if len(errors) > 0 {
-		return StateModelMultiError(errors)
+		return StateRequestMultiError(errors)
 	}
 	return nil
 }
 
-// StateModelMultiError is an error wrapping multiple validation errors
-// returned by StateModel.ValidateAll() if the designated constraints aren't met.
-type StateModelMultiError []error
+// StateRequestMultiError is an error wrapping multiple validation errors
+// returned by StateRequest.ValidateAll() if the designated constraints aren't met.
+type StateRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m StateModelMultiError) Error() string {
+func (m StateRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -79,11 +79,11 @@ func (m StateModelMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m StateModelMultiError) AllErrors() []error { return m }
+func (m StateRequestMultiError) AllErrors() []error { return m }
 
-// StateModelValidationError is the validation error returned by
-// StateModel.Validate if the designated constraints aren't met.
-type StateModelValidationError struct {
+// StateRequestValidationError is the validation error returned by
+// StateRequest.Validate if the designated constraints aren't met.
+type StateRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -91,22 +91,22 @@ type StateModelValidationError struct {
 }
 
 // Field function returns field value.
-func (e StateModelValidationError) Field() string { return e.field }
+func (e StateRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e StateModelValidationError) Reason() string { return e.reason }
+func (e StateRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e StateModelValidationError) Cause() error { return e.cause }
+func (e StateRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e StateModelValidationError) Key() bool { return e.key }
+func (e StateRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e StateModelValidationError) ErrorName() string { return "StateModelValidationError" }
+func (e StateRequestValidationError) ErrorName() string { return "StateRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e StateModelValidationError) Error() string {
+func (e StateRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -118,14 +118,14 @@ func (e StateModelValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sStateModel.%s: %s%s",
+		"invalid %sStateRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = StateModelValidationError{}
+var _ error = StateRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -133,7 +133,156 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = StateModelValidationError{}
+} = StateRequestValidationError{}
+
+// Validate checks the field values on StateResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *StateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StateResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in StateResponseMultiError, or
+// nil if none found.
+func (m *StateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StateResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetOccupiedCells()))
+		i := 0
+		for key := range m.GetOccupiedCells() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetOccupiedCells()[key]
+			_ = val
+
+			// no validation rules for OccupiedCells[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, StateResponseValidationError{
+							field:  fmt.Sprintf("OccupiedCells[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, StateResponseValidationError{
+							field:  fmt.Sprintf("OccupiedCells[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return StateResponseValidationError{
+						field:  fmt.Sprintf("OccupiedCells[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	// no validation rules for Total
+
+	// no validation rules for Available
+
+	if len(errors) > 0 {
+		return StateResponseMultiError(errors)
+	}
+	return nil
+}
+
+// StateResponseMultiError is an error wrapping multiple validation errors
+// returned by StateResponse.ValidateAll() if the designated constraints
+// aren't met.
+type StateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StateResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StateResponseMultiError) AllErrors() []error { return m }
+
+// StateResponseValidationError is the validation error returned by
+// StateResponse.Validate if the designated constraints aren't met.
+type StateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StateResponseValidationError) ErrorName() string { return "StateResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e StateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StateResponseValidationError{}
 
 // Validate checks the field values on OccupiedCell with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -236,151 +385,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = OccupiedCellValidationError{}
-
-// Validate checks the field values on StateResult with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *StateResult) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on StateResult with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in StateResultMultiError, or
-// nil if none found.
-func (m *StateResult) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *StateResult) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	{
-		sorted_keys := make([]string, len(m.GetOccupiedCells()))
-		i := 0
-		for key := range m.GetOccupiedCells() {
-			sorted_keys[i] = key
-			i++
-		}
-		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
-		for _, key := range sorted_keys {
-			val := m.GetOccupiedCells()[key]
-			_ = val
-
-			// no validation rules for OccupiedCells[key]
-
-			if all {
-				switch v := interface{}(val).(type) {
-				case interface{ ValidateAll() error }:
-					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, StateResultValidationError{
-							field:  fmt.Sprintf("OccupiedCells[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				case interface{ Validate() error }:
-					if err := v.Validate(); err != nil {
-						errors = append(errors, StateResultValidationError{
-							field:  fmt.Sprintf("OccupiedCells[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				}
-			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
-				if err := v.Validate(); err != nil {
-					return StateResultValidationError{
-						field:  fmt.Sprintf("OccupiedCells[%v]", key),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		}
-	}
-
-	// no validation rules for Total
-
-	// no validation rules for Available
-
-	if len(errors) > 0 {
-		return StateResultMultiError(errors)
-	}
-	return nil
-}
-
-// StateResultMultiError is an error wrapping multiple validation errors
-// returned by StateResult.ValidateAll() if the designated constraints aren't met.
-type StateResultMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m StateResultMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m StateResultMultiError) AllErrors() []error { return m }
-
-// StateResultValidationError is the validation error returned by
-// StateResult.Validate if the designated constraints aren't met.
-type StateResultValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e StateResultValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e StateResultValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e StateResultValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e StateResultValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e StateResultValidationError) ErrorName() string { return "StateResultValidationError" }
-
-// Error satisfies the builtin error interface
-func (e StateResultValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sStateResult.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = StateResultValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = StateResultValidationError{}

@@ -9,18 +9,20 @@ import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-va
 
 service Price {
 	// Get price per gram of the metal on LME
-	rpc Price(PriceModel) returns (PriceResult) {
+	rpc Price(PriceRequest) returns (PriceResponse) {
 		option (google.api.http) = {
 			get: "/v1/price/{metal}"
 		};
 	}
 }
 
-message PriceModel {
+message PriceRequest {
+	// Metal: "au" or "ag"
 	string metal = 1 [(validate.rules).string = { in: ["au", "ag"] }];
 }
 
-message PriceResult {
+message PriceResponse {
 	// Currency to value: USD => 71.40
 	map<string,string> price = 1;
+	reserved 2 to 5;
 }

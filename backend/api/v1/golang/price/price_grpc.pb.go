@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PriceClient interface {
 	// Get price per gram of the metal on LME
-	Price(ctx context.Context, in *PriceModel, opts ...grpc.CallOption) (*PriceResult, error)
+	Price(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
 }
 
 type priceClient struct {
@@ -30,8 +30,8 @@ func NewPriceClient(cc grpc.ClientConnInterface) PriceClient {
 	return &priceClient{cc}
 }
 
-func (c *priceClient) Price(ctx context.Context, in *PriceModel, opts ...grpc.CallOption) (*PriceResult, error) {
-	out := new(PriceResult)
+func (c *priceClient) Price(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
+	out := new(PriceResponse)
 	err := c.cc.Invoke(ctx, "/core.backend.integration.api.v1.price.Price/Price", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (c *priceClient) Price(ctx context.Context, in *PriceModel, opts ...grpc.Ca
 // for forward compatibility
 type PriceServer interface {
 	// Get price per gram of the metal on LME
-	Price(context.Context, *PriceModel) (*PriceResult, error)
+	Price(context.Context, *PriceRequest) (*PriceResponse, error)
 	mustEmbedUnimplementedPriceServer()
 }
 
@@ -52,7 +52,7 @@ type PriceServer interface {
 type UnimplementedPriceServer struct {
 }
 
-func (UnimplementedPriceServer) Price(context.Context, *PriceModel) (*PriceResult, error) {
+func (UnimplementedPriceServer) Price(context.Context, *PriceRequest) (*PriceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Price not implemented")
 }
 func (UnimplementedPriceServer) mustEmbedUnimplementedPriceServer() {}
@@ -69,7 +69,7 @@ func RegisterPriceServer(s grpc.ServiceRegistrar, srv PriceServer) {
 }
 
 func _Price_Price_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PriceModel)
+	in := new(PriceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func _Price_Price_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: "/core.backend.integration.api.v1.price.Price/Price",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PriceServer).Price(ctx, req.(*PriceModel))
+		return srv.(PriceServer).Price(ctx, req.(*PriceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -14,11 +14,11 @@ Goldex backend communicates with a Goldex vending terminal directly over secured
 
 ### Backend callbacks
 
-Goldex sends [callbacks](/CALLBACK.md) to notify your backend about a new events or to request some information for the vending terminal in real time.
+Goldex sends HTTP callbacks to notify your backend about a new events or to request some information for the vending terminal in real time.
 
-Navigate to Goldex dashbaord to setup callbacks, keys etc.
+Navigate to Goldex dashboard to setup callbacks, keys etc.
 
-[Documentation](https://goldexrobot.github.io/core.integration/swagger/#/backend-callbacks)
+[Callbacks](/CALLBACK.md).
 
 ### Backend API
 
@@ -28,6 +28,8 @@ Moreover the API allows you to control a vending terminal.
 Calls to HTTP API must be properly [signed](/SIGNATURE.md) with per-project private key. You can get the key in Goldex dashboard.
 
 GRPC API is also available.
+
+[Documentation](https://goldexrobot.github.io/core.integration/).
 
 ---
 
