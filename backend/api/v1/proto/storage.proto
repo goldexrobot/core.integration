@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package core.backend.integration.api.v1.storage;
+
+option go_package="github.com/goldexrobot/core.integration/api/v1/golang/storage/storage;storage";
+
+import "google/api/annotations.proto";
+// import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+service Storage {
+	// Get occupied storage cells for the bot specified by ID
+	rpc State(StateModel) returns (StateResult) {
+		option (google.api.http) = {
+			get: "/v1/storage/{bot_id}/state"
+		};
+	}
+}
+
+message StateModel {
+	// Bot ID
+	uint64 bot_id = 1;
+}
+
+message OccupiedCell {
+	// Domain in which the cell is occupied
+	string domain = 1;
+	// Occupation transaction
+	string transaction = 2;
+}
+
+message StateResult {
+	// Occupied cells
+	map<string,OccupiedCell> occupied_cells = 1;
+	// Total available cells or -1 if unknown
+	int32 total = 2;
+	// Available (free) cells or -1 if unknown
+	int32 available = 3;
+}

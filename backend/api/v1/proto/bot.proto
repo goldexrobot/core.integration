@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package core.backend.integration.api.v1.bot;
+
+option go_package="github.com/goldexrobot/core.integration/api/v1/golang/bot/bot;bot";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+service Bot {
+	// Send bot command
+	rpc SendCommand(SendCommandModel) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			post: "/v1/bot/{bot_id}/command"
+		};
+	}
+}
+
+message SendCommandModel {
+	uint64 bot_id = 1;
+	string command = 2 [(validate.rules).string = { in: ["mode_out_of_service", "mode_operational", "stop_alarm", "power_off"] }];
+}

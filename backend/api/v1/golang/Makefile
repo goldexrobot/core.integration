@@ -1,6 +1,6 @@
-PROTOC_INC := -I ./../proto -I ./../../include -I /usr/local/include/ -I ${GOPATH}/pkg/mod/github.com/envoyproxy/protoc-gen-validate@$(shell go list -m -f '{{ .Version }}' "github.com/envoyproxy/protoc-gen-validate")
+PROTOC_INC := -I ./../proto -I ./../../include -I ${GOPATH}/pkg/mod/github.com/envoyproxy/protoc-gen-validate@$(shell go list -m -f '{{ .Version }}' "github.com/envoyproxy/protoc-gen-validate")
 
-all: file.proto
+all: bot.proto file.proto price.proto storage.proto
 	@:
 
 %.proto:

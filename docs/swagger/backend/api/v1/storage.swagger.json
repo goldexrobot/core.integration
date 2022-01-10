@@ -1,0 +1,117 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "storage.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Storage"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/storage/{botId}/state": {
+      "get": {
+        "summary": "Get occupied storage cells for the bot specified by ID",
+        "operationId": "Storage_State",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/storageStateResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "botId",
+            "description": "Bot ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "Storage"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "storageOccupiedCell": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "title": "Domain in which the cell is occupied"
+        },
+        "transaction": {
+          "type": "string",
+          "title": "Occupation transaction"
+        }
+      }
+    },
+    "storageStateResult": {
+      "type": "object",
+      "properties": {
+        "occupiedCells": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/storageOccupiedCell"
+          },
+          "title": "Occupied cells"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total available cells or -1 if unknown"
+        },
+        "available": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Available (free) cells or -1 if unknown"
+        }
+      }
+    }
+  }
+}

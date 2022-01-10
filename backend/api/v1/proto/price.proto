@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package core.backend.integration.api.v1.price;
+
+option go_package="github.com/goldexrobot/core.integration/api/v1/golang/price/price;price";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
+
+service Price {
+	// Get price per gram of the metal on LME
+	rpc Price(PriceModel) returns (PriceResult) {
+		option (google.api.http) = {
+			get: "/v1/price/{metal}"
+		};
+	}
+}
+
+message PriceModel {
+	string metal = 1 [(validate.rules).string = { in: ["au", "ag"] }];
+}
+
+message PriceResult {
+	// Currency to value: USD => 71.40
+	map<string,string> price = 1;
+}
