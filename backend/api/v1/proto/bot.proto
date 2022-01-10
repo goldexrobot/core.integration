@@ -33,9 +33,7 @@ message ListResponse {
 message BotInfo {
 	// Serial number
 	string serial = 1;
-	// Active UI packages: channel to revision
-	map<string,string> ui_packages = 2;
-	reserved 3 to 10;
+	reserved 2 to 10;
 }
 
 message SendCommandRequest {

@@ -202,8 +202,6 @@ func (m *BotInfo) validate(all bool) error {
 
 	// no validation rules for Serial
 
-	// no validation rules for UiPackages
-
 	if len(errors) > 0 {
 		return BotInfoMultiError(errors)
 	}

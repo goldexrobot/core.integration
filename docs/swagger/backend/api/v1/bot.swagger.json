@@ -89,13 +89,6 @@
         "serial": {
           "type": "string",
           "title": "Serial number"
-        },
-        "uiPackages": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Active UI packages: channel to revision"
         }
       }
     },
