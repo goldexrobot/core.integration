@@ -19,7 +19,7 @@
     "/v1/storage/{botId}/state": {
       "get": {
         "summary": "Get occupied storage cells for the bot specified by ID",
-        "operationId": "Storage_State",
+        "operationId": "state",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -80,6 +80,10 @@
     },
     "storageOccupiedCell": {
       "type": "object",
+      "example": {
+        "domain": "buyout",
+        "transaction": "bdb1971335e44be6b29a0733e58c8a24"
+      },
       "properties": {
         "domain": {
           "type": "string",
@@ -93,6 +97,14 @@
     },
     "storageStateResponse": {
       "type": "object",
+      "example": {
+        "occupied_cells": {
+          "A1": "\u003cOccupiedCell\u003e",
+          "B6": "\u003cOccupiedCell\u003e"
+        },
+        "total": -1,
+        "available": -1
+      },
       "properties": {
         "occupiedCells": {
           "type": "object",

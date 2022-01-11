@@ -19,7 +19,7 @@
     "/v1/bot": {
       "get": {
         "summary": "List bots related to the project",
-        "operationId": "Bot_List",
+        "operationId": "list",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -42,7 +42,7 @@
     "/v1/bot/{botId}/command": {
       "post": {
         "summary": "Send bot command",
-        "operationId": "Bot_SendCommand",
+        "operationId": "send-command",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -85,6 +85,9 @@
   "definitions": {
     "botBotInfo": {
       "type": "object",
+      "example": {
+        "serial": "CB-616"
+      },
       "properties": {
         "serial": {
           "type": "string",
@@ -94,15 +97,35 @@
     },
     "botCommand": {
       "type": "object",
+      "example": {
+        "name": "mode_out_of_service"
+      },
       "properties": {
-        "command": {
-          "type": "string",
+        "name": {
+          "$ref": "#/definitions/botCommandName",
           "title": "Command name"
         }
       }
     },
+    "botCommandName": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "mode_out_of_service",
+        "mode_operational",
+        "stop_alarm",
+        "power_off"
+      ],
+      "default": "unknown"
+    },
     "botListResponse": {
       "type": "object",
+      "example": {
+        "bots": {
+          "42": "\u003cBotInfo\u003e",
+          "1337": "\u003cBotInfo\u003e"
+        }
+      },
       "properties": {
         "bots": {
           "type": "object",

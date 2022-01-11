@@ -5,13 +5,17 @@ package core.backend.integration.api.v1.price;
 option go_package="github.com/goldexrobot/core.integration/api/v1/golang/price/price;price";
 
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
 
 service Price {
 	// Get price per gram of the metal on LME
 	rpc Price(PriceRequest) returns (PriceResponse) {
 		option (google.api.http) = {
-			get: "/v1/price/{metal}"
+			get: "/v1/price/{metal}";
+		};
+		option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+			operation_id: "price";
 		};
 	}
 }
@@ -22,7 +26,12 @@ message PriceRequest {
 }
 
 message PriceResponse {
-	// Currency to value: USD => 71.40
+	option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: '{"price": { "USD": "58.12", "EUR": "51.25", "XXX": "XX.XX" }}';
+    };
+
+	// Currency to value: USD => 58.12
 	map<string,string> price = 1;
+
 	reserved 2 to 5;
 }

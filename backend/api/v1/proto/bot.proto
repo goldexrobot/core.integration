@@ -5,6 +5,7 @@ package core.backend.integration.api.v1.bot;
 option go_package="github.com/goldexrobot/core.integration/api/v1/golang/bot/bot;bot";
 
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/empty.proto";
 import "validate/validate.proto"; // https://github.com/envoyproxy/protoc-gen-validate#constraint-rules
 
@@ -12,27 +13,44 @@ service Bot {
 	// List bots related to the project
 	rpc List(google.protobuf.Empty) returns (ListResponse) {
 		option (google.api.http) = {
-			get: "/v1/bot"
+			get: "/v1/bot";
+		};
+		option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+			operation_id: "list";
 		};
 	}
+
 	// Send bot command
 	rpc SendCommand(SendCommandRequest) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
-			post: "/v1/bot/{bot_id}/command"
-			body: "command",
+			post: "/v1/bot/{bot_id}/command";
+			body: "command";
+		};
+		option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+			operation_id: "send-command";
 		};
 	}
 }
 
 message ListResponse {
+	option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: '{"bots": { "42": "<BotInfo>", "1337": "<BotInfo>" }}';
+    };
+
 	// ID to bot description
 	map<uint64,BotInfo> bots = 1;
+
 	reserved 2 to 5;
 }
 
 message BotInfo {
+	option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: '{"serial": "CB-616"}';
+    };
+
 	// Serial number
 	string serial = 1;
+
 	reserved 2 to 10;
 }
 
@@ -44,7 +62,20 @@ message SendCommandRequest {
 }
 
 message Command {
+	option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: '{"name": "mode_out_of_service"}';
+    };
+
 	// Command name
-	string command = 1 [(validate.rules).string = { in: ["mode_out_of_service", "mode_operational", "stop_alarm", "power_off"] }];
+	CommandName name = 1 [(validate.rules).enum.defined_only = true];
+
 	reserved 2 to 5;
+}
+
+enum CommandName {
+	unknown = 0;
+	mode_out_of_service = 1;
+	mode_operational = 2;
+	stop_alarm = 3;
+	power_off = 4;
 }

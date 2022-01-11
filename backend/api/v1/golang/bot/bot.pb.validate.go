@@ -442,10 +442,10 @@ func (m *Command) validate(all bool) error {
 
 	var errors []error
 
-	if _, ok := _Command_Command_InLookup[m.GetCommand()]; !ok {
+	if _, ok := CommandName_name[int32(m.GetName())]; !ok {
 		err := CommandValidationError{
-			field:  "Command",
-			reason: "value must be in list [mode_out_of_service mode_operational stop_alarm power_off]",
+			field:  "Name",
+			reason: "value must be one of the defined enum values",
 		}
 		if !all {
 			return err
@@ -528,10 +528,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CommandValidationError{}
-
-var _Command_Command_InLookup = map[string]struct{}{
-	"mode_out_of_service": {},
-	"mode_operational":    {},
-	"stop_alarm":          {},
-	"power_off":           {},
-}

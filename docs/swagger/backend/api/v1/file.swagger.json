@@ -18,11 +18,11 @@
   "paths": {
     "/v1/file/{id}": {
       "get": {
-        "summary": "Get a file by ID",
-        "operationId": "File_File",
+        "summary": "Get file/photo content by ID",
+        "operationId": "file",
         "responses": {
           "200": {
-            "description": "A successful response.(streaming responses)",
+            "description": "For GRPC",
             "schema": {
               "type": "object",
               "properties": {
@@ -34,6 +34,22 @@
                 }
               },
               "title": "Stream result of apiHttpBody"
+            },
+            "examples": {
+              "any": "streamed google.api.HttpBody"
+            }
+          },
+          "200-http": {
+            "description": "For HTTP",
+            "schema": {},
+            "examples": {
+              "any": "\u003cimage bytes\u003e"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "any",
+                "type": "string"
+              }
             }
           },
           "default": {
@@ -54,6 +70,9 @@
         ],
         "tags": [
           "File"
+        ],
+        "produces": [
+          "any"
         ]
       }
     }

@@ -19,7 +19,7 @@
     "/v1/price/{metal}": {
       "get": {
         "summary": "Get price per gram of the metal on LME",
-        "operationId": "Price_Price",
+        "operationId": "price",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -52,13 +52,20 @@
   "definitions": {
     "pricePriceResponse": {
       "type": "object",
+      "example": {
+        "price": {
+          "USD": "58.12",
+          "EUR": "51.25",
+          "XXX": "XX.XX"
+        }
+      },
       "properties": {
         "price": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           },
-          "title": "Currency to value: USD =\u003e 71.40"
+          "title": "Currency to value: USD =\u003e 58.12"
         }
       }
     },

@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileClient interface {
-	// Get a file by ID
+	// Get file/photo content by ID
 	File(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (File_FileClient, error)
 }
 
@@ -67,7 +67,7 @@ func (x *fileFileClient) Recv() (*httpbody.HttpBody, error) {
 // All implementations must embed UnimplementedFileServer
 // for forward compatibility
 type FileServer interface {
-	// Get a file by ID
+	// Get file/photo content by ID
 	File(*FileRequest, File_FileServer) error
 	mustEmbedUnimplementedFileServer()
 }
