@@ -98,7 +98,7 @@
     "storageStateResponse": {
       "type": "object",
       "example": {
-        "occupied_cells": {
+        "occupiedCells": {
           "A1": "\u003cOccupiedCell\u003e",
           "B6": "\u003cOccupiedCell\u003e"
         },
