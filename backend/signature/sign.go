@@ -24,7 +24,7 @@ type SignedRequest struct {
 	BodyHashAlg crypto.Hash
 }
 
-func (r SignedRequest) Sign(smethod jwt.SigningMethod, privateKey interface{}) (jwtToken string, err error) {
+func (r SignedRequest) Sign(smethod jwt.SigningMethod, privateKey interface{}, notBefore time.Time) (jwtToken string, err error) {
 	switch {
 	case smethod == nil:
 		err = errors.New("signing method can't be empty")
@@ -66,12 +66,15 @@ func (r SignedRequest) Sign(smethod jwt.SigningMethod, privateKey interface{}) (
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			NotBefore: jwt.NewNumericDate(time.Now().UTC()),
-			Issuer:    r.Signer,
-			Subject:   string(r.Subject),
-			ID:        r.Nonce,
-			Audience:  r.Recipients,
+
+			Issuer:   r.Signer,
+			Subject:  string(r.Subject),
+			ID:       r.Nonce,
+			Audience: r.Recipients,
 		},
+	}
+	if !notBefore.IsZero() {
+		claims.RegisteredClaims.NotBefore = jwt.NewNumericDate(notBefore.UTC())
 	}
 
 	// sign

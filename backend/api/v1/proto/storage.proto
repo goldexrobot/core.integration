@@ -27,7 +27,7 @@ message StateRequest {
 
 message StateResponse {
 	option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-        example: '{"occupied_cells": { "A1": "<OccupiedCell>", "B6": "<OccupiedCell>" }, "total": -1, "available": -1 }';
+        example: '{"occupiedCells": { "A1": "<OccupiedCell>", "B6": "<OccupiedCell>" }, "total": -1, "available": -1 }';
     };
 
 	// Occupied cells

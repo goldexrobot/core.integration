@@ -3,6 +3,7 @@ package signature
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -114,7 +115,7 @@ func TestSignedRequest_Sign(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.r.Sign(tt.args.smethod, tt.args.privateKey)
+			_, err := tt.r.Sign(tt.args.smethod, tt.args.privateKey, time.Now())
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SignedRequest.Sign() error = %v, wantErr %v", err, tt.wantErr)
 				return

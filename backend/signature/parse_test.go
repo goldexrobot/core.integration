@@ -6,6 +6,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -79,7 +80,7 @@ func TestParseToken(t *testing.T) {
 	}
 
 	var sign = func(r SignedRequest, smethod jwt.SigningMethod) string {
-		j, err := r.Sign(smethod, keypair[r.Signer].Private)
+		j, err := r.Sign(smethod, keypair[r.Signer].Private, time.Now())
 		if err != nil {
 			t.Fatal(err)
 		}
