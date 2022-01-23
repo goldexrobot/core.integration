@@ -47,12 +47,24 @@ WebKit engine is used to serve HTML. There are some limitations:
 
 - The terminal have a touchscreen, so please keep in mind double-taps and mistaps. See details below;
 - Utilize all the required resources locally, i.e. JS, CSS, icons, etc., except videos;
-- Do not embed huge resources like video into the UI package;
+- Do not embed huge resources like video into the UI package, use resources downloading instead (see below);
 - Do not use transparent video;
 - Database is unavailable, use local storage instead;
 - PDF rendering is not supported;
 - WebGL is not available;
 - Java is not available;
+
+#### Resources downloading
+
+Goldex terminal handles `GET /cached` method locally (i.e. on localhost, where UI is served) to download and cache any required runtime resources like images, videos etc.
+
+Because of there is no a browser cache, it's recommended to use the method to get frequently used huge data once at the startup and then request it later with zero-time delivery.
+
+Syntax: `GET /cached?url={url}&auth={auth}`, where `{url}` is URL-encoded path to a resource and `{auth}` is (optional) URL-encoded `Authorization` header value.
+
+Do not rely on response headers as the method does not copy them from original request. Original request is assumed successful on any HTTP status 200 to 299.
+
+Cache is purged on every terminal restart.
 
 #### Touchscreen
 
@@ -107,6 +119,8 @@ Goldex provides terminal API emulator to simplify UI development. You'll find bi
 The emulator serves terminal API on your local machine. The emulator does not emulate optional hardware, but can be connected to the Goldex sandbox environment, therefore can communicate with your testing backend. You'll need TLS certificate issued by Goldex to connect the emulator to the sandbox environment, so please contact Goldex team to get it.
 
 Emulator accepts commands to simulate connectivity, hardware and functional errors which could be occurred during real terminal usage. Please pay attention developing your UI.
+
+Emulator does not provides resources downloading functionality, so implement it on your own.
 
 #### Terminal API flow
 
