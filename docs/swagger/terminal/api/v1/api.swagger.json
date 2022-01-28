@@ -17,69 +17,6 @@
   "host": "localhost:80",
   "basePath": "/ws",
   "paths": {
-    "/backend": {
-      "post": {
-        "description": "Performs a call to a named backend method defined in Goldex dashboard.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Other"
-        ],
-        "summary": "Call to a named backend method.",
-        "operationId": "Backend",
-        "parameters": [
-          {
-            "description": "JSONRPC params",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/BackendRequest"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "JSONRPC error"
-          },
-          "x-jsonrpc-success": {
-            "description": "Result",
-            "schema": {
-              "$ref": "#/definitions/BackendResult"
-            }
-          }
-        }
-      }
-    },
-    "/camera.frontal": {
-      "post": {
-        "description": "Requires the terminal to take a photo from frontal camera and upload it to Goldex backend. Photo could be accessed via Goldex API by returned file ID.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Other"
-        ],
-        "summary": "Take a photo from frontal camera.",
-        "operationId": "CameraFrontal",
-        "responses": {
-          "default": {
-            "description": "JSONRPC error"
-          },
-          "x-jsonrpc-success": {
-            "description": "Result",
-            "schema": {
-              "$ref": "#/definitions/CameraResult"
-            }
-          }
-        }
-      }
-    },
     "/eval.hydro": {
       "post": {
         "description": "Starts a hydrostatic evaluation of the item. Should be called right after `eval.spectrum`.\nOn successful hydrostatic evaluation the item might be returned back to customer with `eval.return`.",
@@ -216,6 +153,42 @@
             "description": "Result (one of)",
             "schema": {
               "$ref": "#/definitions/EvalStoreResult"
+            }
+          }
+        }
+      }
+    },
+    "/goldex": {
+      "post": {
+        "description": "Performs a call to a named backend method defined in Goldex dashboard.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Other"
+        ],
+        "summary": "Call to a named Goldex backend method.",
+        "operationId": "Goldex",
+        "parameters": [
+          {
+            "description": "JSONRPC params",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/GoldexRequest"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "JSONRPC error"
+          },
+          "x-jsonrpc-success": {
+            "description": "Result",
+            "schema": {
+              "$ref": "#/definitions/GoldexResult"
             }
           }
         }
@@ -411,73 +384,6 @@
     }
   },
   "definitions": {
-    "BackendRequest": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "description": "request key-value",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Body",
-          "example": {
-            "bar": [
-              "baz",
-              "qux"
-            ],
-            "foo": "bar"
-          }
-        },
-        "method": {
-          "description": "predefined method name",
-          "type": "string",
-          "x-go-name": "Method",
-          "example": "my-method"
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
-    "BackendResult": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "description": "result key-value",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Body",
-          "example": {
-            "bar": [
-              "baz",
-              "qux"
-            ],
-            "foo": "bar"
-          }
-        },
-        "http_status": {
-          "description": "http status",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "HttpStatus",
-          "example": 200
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
-    "CameraResult": {
-      "type": "object",
-      "properties": {
-        "file_id": {
-          "description": "uploaded file ID",
-          "type": "string",
-          "x-go-name": "FileID",
-          "example": "5aca2ad7044e4c00aa30d85f0a723eb8"
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
     "EvalHydroResult": {
       "type": "object",
       "properties": {
@@ -745,15 +651,115 @@
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
     },
-    "HardwareEvent": {
+    "GoldexRequest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "request key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Body",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        },
+        "method": {
+          "description": "predefined method name",
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "my-method"
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "GoldexResult": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "result key-value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Body",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        },
+        "http_status": {
+          "description": "http status",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "HttpStatus",
+          "example": 200
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "HardwareRequest": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "description": "method name",
+          "type": "string",
+          "x-go-name": "Method",
+          "example": "my-method"
+        },
+        "name": {
+          "description": "named hardware",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "my-pos"
+        },
+        "params": {
+          "description": "method params",
+          "type": "object",
+          "x-go-name": "Params",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "HardwareResult": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "description": "result data",
+          "type": "object",
+          "x-go-name": "Result",
+          "example": {
+            "bar": [
+              "baz",
+              "qux"
+            ],
+            "foo": "bar"
+          }
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
+    },
+    "OptionalHardwareEvent": {
       "type": "object",
       "properties": {
         "data": {
           "description": "event data key-value",
           "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
           "x-go-name": "Data",
           "example": {
             "bar": [
@@ -774,66 +780,6 @@
           "type": "string",
           "x-go-name": "Name",
           "example": "my-pos"
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
-    "HardwareRequest": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "description": "request key-value",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Data",
-          "example": {
-            "bar": [
-              "baz",
-              "qux"
-            ],
-            "foo": "bar"
-          }
-        },
-        "method": {
-          "description": "method name",
-          "type": "string",
-          "x-go-name": "Method",
-          "example": "my-method"
-        },
-        "name": {
-          "description": "named hardware",
-          "type": "string",
-          "x-go-name": "Name",
-          "example": "my-pos"
-        }
-      },
-      "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"
-    },
-    "HardwareResult": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "description": "hardware specific error",
-          "type": "string",
-          "x-go-name": "Error",
-          "example": "optional failure description"
-        },
-        "result": {
-          "description": "result key-value",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Result",
-          "example": {
-            "bar": [
-              "baz",
-              "qux"
-            ],
-            "foo": "bar"
-          }
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/terminal/api/v1"

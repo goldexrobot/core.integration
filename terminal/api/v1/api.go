@@ -264,9 +264,9 @@ type API interface {
 	//     description: JSONRPC error
 	Status() (res StatusResult, err error)
 
-	// swagger:operation POST /backend Backend
+	// swagger:operation POST /goldex Goldex
 	//
-	// Call to a named backend method.
+	// Call to a named Goldex backend method.
 	//
 	// Performs a call to a named backend method defined in Goldex dashboard.
 	// ---
@@ -280,15 +280,15 @@ type API interface {
 	//   - in: body
 	//     description: JSONRPC params
 	//     schema:
-	//       $ref: "#/definitions/BackendRequest"
+	//       $ref: "#/definitions/GoldexRequest"
 	// responses:
 	//   x-jsonrpc-success:
 	//     description: Result
 	//     schema:
-	//       $ref: "#/definitions/BackendResult"
+	//       $ref: "#/definitions/GoldexResult"
 	//   default:
 	//     description: JSONRPC error
-	Backend(req BackendRequest) (res BackendResult, err error)
+	Goldex(req GoldexRequest) (res GoldexResult, err error)
 
 	// swagger:operation POST /hardware Hardware
 	//
@@ -315,27 +315,6 @@ type API interface {
 	//   default:
 	//     description: JSONRPC error
 	Hardware(req HardwareRequest) (res HardwareResult, err error)
-
-	// swagger:operation POST /camera.frontal CameraFrontal
-	//
-	// Take a photo from frontal camera.
-	//
-	// Requires the terminal to take a photo from frontal camera and upload it to Goldex backend. Photo could be accessed via Goldex API by returned file ID.
-	// ---
-	// consumes:
-	// - application/json
-	// produces:
-	// - application/json
-	// tags:
-	//   - Other
-	// responses:
-	//   x-jsonrpc-success:
-	//     description: Result
-	//     schema:
-	//       $ref: "#/definitions/CameraResult"
-	//   default:
-	//     description: JSONRPC error
-	CameraFrontal() (res CameraResult, err error)
 
 	////// EVENTS //////
 
@@ -590,7 +569,7 @@ type StatusResultFeatures struct {
 }
 
 // swagger:model
-type BackendRequest struct {
+type GoldexRequest struct {
 	// predefined method name
 	//
 	// example: my-method
@@ -603,7 +582,7 @@ type BackendRequest struct {
 }
 
 // swagger:model
-type BackendResult struct {
+type GoldexResult struct {
 	// http status
 	//
 	// example: 200
@@ -627,35 +606,22 @@ type HardwareRequest struct {
 	// example: my-method
 	Method string `json:"method" validate:"required"`
 
-	// request key-value
+	// method params
 	//
 	// example: {"foo":"bar","bar":["baz","qux"]}
-	Data map[string]interface{} `json:"data"`
+	Params interface{} `json:"params"`
 }
 
 // swagger:model
 type HardwareResult struct {
-	// result key-value
+	// result data
 	//
 	// example: {"foo":"bar","bar":["baz","qux"]}
-	Result map[string]interface{} `json:"result"`
-
-	// hardware specific error
-	//
-	// example: optional failure description
-	Error string `json:"error,omitempty"`
+	Result interface{} `json:"result"`
 }
 
 // swagger:model
-type CameraResult struct {
-	// uploaded file ID
-	//
-	// example: 5aca2ad7044e4c00aa30d85f0a723eb8
-	FileID string `json:"file_id"`
-}
-
-// swagger:model
-type HardwareEvent struct {
+type OptionalHardwareEvent struct {
 	// named hardware
 	//
 	// example: my-pos
@@ -669,5 +635,5 @@ type HardwareEvent struct {
 	// event data key-value
 	//
 	// example: {"foo":"bar","bar":["baz","qux"]}
-	Data map[string]interface{} `json:"data"`
+	Data interface{} `json:"data"`
 }

@@ -3,12 +3,10 @@ package api
 import (
 	"context"
 	"errors"
-	"strings"
 	"sync/atomic"
 	"time"
 
 	apiv1 "github.com/goldexrobot/core.integration/terminal/api/v1"
-	"github.com/google/uuid"
 )
 
 var storageCellsOrder = []string{
@@ -339,7 +337,7 @@ func (c *Controller) IntegrationUIMethod(method string, body map[string]interfac
 	return
 }
 
-func (c *Controller) OptionalHardwareHealthcheck() (health map[string]bool, err error) {
+func (c *Controller) OptionalHardwareHealth() (health map[string]bool, err error) {
 	health = map[string]bool{
 		"my-pos-terminal": true,
 		"my-printer":      true,
@@ -347,9 +345,8 @@ func (c *Controller) OptionalHardwareHealthcheck() (health map[string]bool, err 
 	return
 }
 
-func (c *Controller) OptionalHardwareRPC(module, method string, request map[string]interface{}) (result map[string]interface{}, subError string, err error) {
-	if xerr := c.accessHardware(3); xerr != nil {
-		subError = xerr.Error()
+func (c *Controller) OptionalHardwareMethod(module, method string, request interface{}) (result interface{}, err error) {
+	if err = c.accessHardware(3); err != nil {
 		return
 	}
 	result = request
@@ -357,10 +354,6 @@ func (c *Controller) OptionalHardwareRPC(module, method string, request map[stri
 }
 
 func (c *Controller) UploadFrontalCameraPhotoForEval() {}
-
-func (c *Controller) UploadFrontalCameraPhoto() (fileID string, err error) {
-	return strings.ReplaceAll(uuid.NewString(), "-", ""), nil
-}
 
 func (c *Controller) InternetConnectivity() (ok bool) {
 	return c.accessNetwork()

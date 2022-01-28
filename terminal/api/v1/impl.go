@@ -72,11 +72,10 @@ type Hardwarer interface {
 
 	IntegrationUIMethod(method string, body map[string]interface{}) (httpStatus int, response map[string]interface{}, err error)
 
-	OptionalHardwareHealthcheck() (health map[string]bool, err error)
-	OptionalHardwareRPC(module, method string, request map[string]interface{}) (result map[string]interface{}, subError string, err error)
+	OptionalHardwareHealth() (health map[string]bool, err error)
+	OptionalHardwareMethod(module, method string, request interface{}) (result interface{}, err error)
 
 	UploadFrontalCameraPhotoForEval()
-	UploadFrontalCameraPhoto() (fileID string, err error)
 
 	InternetConnectivity() (ok bool)
 	HasStorage() (ok bool)
@@ -545,7 +544,7 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 
 // Checks the internet connection and custom hardware modules are available.
 func (a *Impl) Status() (res StatusResult, err error) {
-	sh, err := a.hw.OptionalHardwareHealthcheck()
+	sh, err := a.hw.OptionalHardwareHealth()
 	if err != nil {
 		return
 	}
@@ -562,7 +561,7 @@ func (a *Impl) Status() (res StatusResult, err error) {
 }
 
 // Performs a call to a named backend method defined in Goldex dashboard.
-func (a *Impl) Backend(req BackendRequest) (res BackendResult, err error) {
+func (a *Impl) Goldex(req GoldexRequest) (res GoldexResult, err error) {
 	if err = newValidator().Struct(req); err != nil {
 		return
 	}
@@ -570,7 +569,7 @@ func (a *Impl) Backend(req BackendRequest) (res BackendResult, err error) {
 	if err != nil {
 		return
 	}
-	res = BackendResult{
+	res = GoldexResult{
 		HttpStatus: httpStatus,
 		Body:       response,
 	}
@@ -582,25 +581,12 @@ func (a *Impl) Hardware(req HardwareRequest) (res HardwareResult, err error) {
 	if err = newValidator().Struct(req); err != nil {
 		return
 	}
-	kv, herr, err := a.hw.OptionalHardwareRPC(req.Name, req.Method, req.Data)
+	kv, err := a.hw.OptionalHardwareMethod(req.Name, req.Method, req.Params)
 	if err != nil {
 		return
 	}
 	res = HardwareResult{
-		Error:  herr,
 		Result: kv,
-	}
-	return
-}
-
-// Requires the terminal to take a photo from frontal camera and upload it to Goldex backend. Photo could be accessed via Goldex API by returned file ID.
-func (a *Impl) CameraFrontal() (res CameraResult, err error) {
-	fid, err := a.hw.UploadFrontalCameraPhoto()
-	if err != nil {
-		return
-	}
-	res = CameraResult{
-		FileID: fid,
 	}
 	return
 }

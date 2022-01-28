@@ -99,10 +99,10 @@ func (r *RPC) Status(_ interface{}, res *apiv1.StatusResult) (err error) {
 	return
 }
 
-func (r *RPC) Backend(req *apiv1.BackendRequest, res *apiv1.BackendResult) (err error) {
+func (r *RPC) Goldex(req *apiv1.GoldexRequest, res *apiv1.GoldexResult) (err error) {
 	r.add()
 	defer r.sub()
-	v, err := r.api.Backend(*req)
+	v, err := r.api.Goldex(*req)
 	*res = v
 	return
 }
@@ -111,14 +111,6 @@ func (r *RPC) Hardware(req *apiv1.HardwareRequest, res *apiv1.HardwareResult) (e
 	r.add()
 	defer r.sub()
 	v, err := r.api.Hardware(*req)
-	*res = v
-	return
-}
-
-func (r *RPC) CameraFrontal(_ interface{}, res *apiv1.CameraResult) (err error) {
-	r.add()
-	defer r.sub()
-	v, err := r.api.CameraFrontal()
 	*res = v
 	return
 }
