@@ -439,8 +439,10 @@ func (a *Impl) EvalStore(req EvalStoreRequest) (res EvalStoreResult, err error) 
 			break
 		}
 		if netFail {
-			<-time.After(time.Second * 3)
+			<-time.After(time.Second * 5)
+			continue
 		}
+		break
 	}
 
 	switch {
@@ -509,8 +511,10 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 			break
 		}
 		if netFail {
-			<-time.After(time.Second * 3)
+			<-time.After(time.Second * 5)
+			continue
 		}
+		break
 	}
 
 	switch {
