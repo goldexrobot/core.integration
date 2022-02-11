@@ -5,6 +5,34 @@
   },
   "paths": {},
   "definitions": {
+    "EvalCancelled": {
+      "description": "Evaluation is cancelled by customer or failed",
+      "type": "object",
+      "properties": {
+        "bot_id": {
+          "description": "Bot ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "BotID",
+          "example": 42
+        },
+        "eval_id": {
+          "description": "Evaluation ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "EvalID",
+          "example": 1337
+        },
+        "project_id": {
+          "description": "Project ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "ProjectID",
+          "example": 1
+        }
+      },
+      "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
+    },
     "EvalFinished": {
       "description": "Describes evaluation and decision data and is sent only on successful evaluation completion",
       "type": "object",
@@ -63,14 +91,6 @@
           "x-go-name": "FinenessPurity",
           "example": 99.9
         },
-        "photo": {
-          "description": "Photos available",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/EvalFinishedPhoto"
-          },
-          "x-go-name": "Photo"
-        },
         "project_id": {
           "description": "Project ID",
           "type": "integer",
@@ -117,12 +137,26 @@
       },
       "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     },
-    "EvalFinishedPhoto": {
-      "description": "Contains evaluation photo details",
+    "EvalPhoto": {
+      "description": "New photo is received from the terminal during the evaluation",
       "type": "object",
       "properties": {
+        "bot_id": {
+          "description": "Bot ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "BotID",
+          "example": 42
+        },
+        "eval_id": {
+          "description": "Evaluation ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "EvalID",
+          "example": 1337
+        },
         "origin": {
-          "description": "An origin photo comes from. Here \"item\" is item photo, \"outer\" is external camera",
+          "description": "An origin the photo comes from. Here \"item\" is the item photo, \"outer\" is the external camera",
           "type": "string",
           "x-go-name": "Origin",
           "example": "\"item\", \"outer\""
@@ -138,12 +172,19 @@
           "type": "string",
           "x-go-name": "PreviewID",
           "example": "eef30f5dc98e4c7d8d2f8df9df56c0d0"
+        },
+        "project_id": {
+          "description": "Project ID",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "ProjectID",
+          "example": 1
         }
       },
       "x-go-package": "github.com/goldexrobot/core.integration/backend/callback"
     },
     "EvalStarted": {
-      "description": "Describes new evaluation that is being just started",
+      "description": "A new evaluation is just started",
       "type": "object",
       "properties": {
         "bot_id": {

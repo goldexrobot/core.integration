@@ -3,10 +3,58 @@
 // swagger:meta
 package callback
 
-// Describes new evaluation that is being just started
+// A new evaluation is just started
 //
 // swagger:model
 type EvalStarted struct {
+	// Project ID
+	//
+	// example: 1
+	ProjectID uint64 `json:"project_id"`
+	// Bot ID
+	//
+	// example: 42
+	BotID uint64 `json:"bot_id"`
+	// Evaluation ID
+	//
+	// example: 1337
+	EvalID uint64 `json:"eval_id"`
+}
+
+// New photo is received from the terminal during the evaluation
+//
+// swagger:model
+type EvalPhoto struct {
+	// Project ID
+	//
+	// example: 1
+	ProjectID uint64 `json:"project_id"`
+	// Bot ID
+	//
+	// example: 42
+	BotID uint64 `json:"bot_id"`
+	// Evaluation ID
+	//
+	// example: 1337
+	EvalID uint64 `json:"eval_id"`
+	// File ID
+	//
+	// example: 3dd321739a694bbab93d7aae360a4ab4
+	PhotoID string `json:"photo_id"`
+	// File ID
+	//
+	// example: eef30f5dc98e4c7d8d2f8df9df56c0d0
+	PreviewID string `json:"preview_id"`
+	// An origin the photo comes from. Here "item" is the item photo, "outer" is the external camera
+	//
+	// example: "item", "outer"
+	Origin string `json:"origin"`
+}
+
+// Evaluation is cancelled by customer or failed
+//
+// swagger:model
+type EvalCancelled struct {
 	// Project ID
 	//
 	// example: 1
@@ -55,8 +103,6 @@ type EvalFinished struct {
 	// example: 3.141
 	Weight float64 `json:"weight"`
 
-	// Photos available
-	Photo []EvalFinishedPhoto `json:"photo"`
 	// Overall result confidence/score [0..1], where 1 - is fully confident result, and value below 0.88 is alarming.
 	//
 	// example: 0.889
@@ -82,24 +128,6 @@ type EvalFinished struct {
 	//
 	// example: ["tungsten_in_gold"]
 	Warnings []string `json:"warnings"`
-}
-
-// Contains evaluation photo details
-//
-// swagger:model
-type EvalFinishedPhoto struct {
-	// File ID
-	//
-	// example: 3dd321739a694bbab93d7aae360a4ab4
-	PhotoID string `json:"photo_id"`
-	// File ID
-	//
-	// example: eef30f5dc98e4c7d8d2f8df9df56c0d0
-	PreviewID string `json:"preview_id"`
-	// An origin photo comes from. Here "item" is item photo, "outer" is external camera
-	//
-	// example: "item", "outer"
-	Origin string `json:"origin"`
 }
 
 // This is common data sent in a storage related callbacks
