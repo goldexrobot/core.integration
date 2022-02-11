@@ -459,8 +459,7 @@ func (a *Impl) EvalStore(req EvalStoreRequest) (res EvalStoreResult, err error) 
 
 	cell, err := a.hw.StoreAfterHydroEval()
 	if err != nil {
-		err = a.brokenProxy(err)
-		return
+		_ = a.brokenProxy(err)
 	}
 
 	a.evalState = evalInitial
@@ -530,12 +529,10 @@ func (a *Impl) StorageExtract(req StorageExtractRequest) (res StorageExtractResu
 	}
 
 	if err = a.hw.ExtractCellFromStorage(req.Cell); err != nil {
-		err = a.brokenProxy(err)
-		return
+		_ = a.brokenProxy(err)
 	}
 
 	a.evalState = evalOutletOpened
-
 	res = StorageExtractResult{
 		Success: &StorageExtractResultSuccess{
 			Transaction: tx,
